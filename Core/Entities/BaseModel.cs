@@ -2,5 +2,5 @@ namespace Core.Entities;
 
 public class BaseModel
 {
-    public virtual int Id { get; protected set; }
+    public int Id { get; set; }
 }
