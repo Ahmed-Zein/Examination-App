@@ -1,0 +1,21 @@
+﻿services:
+  sqlserver:
+    container_name: sql-server-db
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=safe-pass123
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:
+    driver: local
+
+#  api:
+#    image: api
+#    build:
+#      context: .
+#      dockerfile: API/Dockerfile
