@@ -9,7 +9,7 @@ using static System.Security.Claims.ClaimTypes;
 
 namespace Application.Services;
 
-public class TokenService(IConfiguration config) : ITokenService
+public sealed class TokenService(IConfiguration config) : ITokenService
 {
     private readonly SymmetricSecurityKey _key = new(Encoding.UTF8.GetBytes(
         config["Jwt:Secret"] ?? throw new InvalidOperationException("JWT:SECRET can't be NULL")));

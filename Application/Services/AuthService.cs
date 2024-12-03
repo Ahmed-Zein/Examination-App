@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
 
-public class AuthService(UserManager<AppUser> userManager, ITokenService tokenService) : IAuthService
+public sealed class AuthService(UserManager<AppUser> userManager, ITokenService tokenService) : IAuthService
 {
     public async Task<Result<AuthenticationResponseDto>> Register(RegisterRequestDto registerRequestDto)
     {
@@ -21,7 +21,8 @@ public class AuthService(UserManager<AppUser> userManager, ITokenService tokenSe
 
         var identityResult = await userManager.CreateAsync(user, registerRequestDto.Password);
         if (!identityResult.Succeeded)
-            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description));
+            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description))
+                .WithValue(_failResponse(identityResult.Errors));
 
         List<string> roles = [AuthRolesConstants.Student];
         identityResult = await userManager.AddToRolesAsync(user, roles);
@@ -29,12 +30,12 @@ public class AuthService(UserManager<AppUser> userManager, ITokenService tokenSe
         if (!identityResult.Succeeded)
         {
             await userManager.DeleteAsync(user); // roll back
-            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description));
+            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description))
+                .WithValue(_failResponse(identityResult.Errors));
         }
 
         var token = tokenService.GenerateToken(user, roles);
-        return Result.Ok(new AuthenticationResponseDto()
-            { Success = true, Message = "successfully registered", Token = token });
+        return Result.Ok(_successResponse(token, "Registered successfully"));
     }
 
     public async Task<Result<AuthenticationResponseDto>> Login(LoginRequestDto loginRequestDto)
@@ -43,15 +44,13 @@ public class AuthService(UserManager<AppUser> userManager, ITokenService tokenSe
 
         if (credentialsResult.IsFailed)
             return Result.Fail<AuthenticationResponseDto>(credentialsResult.Errors)
-                .WithValue(new AuthenticationResponseDto()
-                    { Success = false, Errors = credentialsResult.Errors.Select(e => e.Message).ToList() });
+                .WithValue(_failResponse(credentialsResult.Errors));
 
         var user = credentialsResult.Value;
         var roles = await userManager.GetRolesAsync(user);
         var token = tokenService.GenerateToken(user, roles);
 
-        return Result.Ok(
-            new AuthenticationResponseDto() { Token = token, Success = true, Message = "Login successful" });
+        return Result.Ok(_successResponse(token, "Login successful"));
     }
 
     public async Task<Result<AppUser>> CheckCredentials(string email, string password)
@@ -62,5 +61,26 @@ public class AuthService(UserManager<AppUser> userManager, ITokenService tokenSe
             return Result.Fail<AppUser>("Invalid credentials");
 
         return Result.Ok(user);
+    }
+
+    private static AuthenticationResponseDto _successResponse(string token, string message)
+    {
+        return
+            new AuthenticationResponseDto()
+                { Success = true, Message = message, Token = token };
+    }
+
+    private static AuthenticationResponseDto _failResponse(List<IError> errors)
+    {
+        return
+            new AuthenticationResponseDto()
+                { Success = false, Errors = errors.Select(e => e.Message).ToList() };
+    }
+
+    private static AuthenticationResponseDto _failResponse(IEnumerable<IdentityError> errors)
+    {
+        return
+            new AuthenticationResponseDto()
+                { Success = false, Errors = errors.Select(e => e.Description).ToList() };
     }
 }

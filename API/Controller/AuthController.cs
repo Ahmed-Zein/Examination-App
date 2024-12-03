@@ -12,18 +12,23 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<ActionResult<AuthenticationResponseDto>> Signup([FromBody] RegisterRequestDto registerRequestDto)
     {
         var authResult = await authService.Register(registerRequestDto);
-        return authResult.IsSuccess
-            ? Ok(authResult.Value)
-            : BadRequest(new AuthenticationResponseDto()
-                { Success = false, Errors = authResult.Errors.Select(e => e.Message).ToList() });
+
+        return authResult switch
+        {
+            { IsSuccess: true } => Ok(authResult.Value),
+            { IsSuccess: false } => BadRequest(authResult.Value),
+        };
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthenticationResponseDto>> Login([FromBody] LoginRequestDto loginRequestDto)
     {
         var authResult = await authService.Login(loginRequestDto);
-        return authResult.IsSuccess
-            ? Ok(authResult.Value)
-            : BadRequest(authResult.Value);
+
+        return authResult switch
+        {
+            { IsSuccess: true } => Ok(authResult.Value),
+            { IsSuccess: false } => BadRequest(authResult.Value),
+        };
     }
 }
