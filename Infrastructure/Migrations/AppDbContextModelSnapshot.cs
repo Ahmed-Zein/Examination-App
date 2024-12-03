@@ -133,12 +133,6 @@ namespace Infrastructure.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
@@ -147,6 +141,21 @@ namespace Infrastructure.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Exams");
+                });
+
+            modelBuilder.Entity("Core.Entities.ExamQuestion", b =>
+                {
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuestionId", "ExamId");
+
+                    b.HasIndex("ExamId");
+
+                    b.ToTable("ExamQuestions");
                 });
 
             modelBuilder.Entity("Core.Entities.ExamResult", b =>
@@ -161,7 +170,16 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ExamId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<int>("StudentScore")
@@ -187,7 +205,7 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ExamId")
+                    b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
@@ -196,7 +214,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExamId");
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("Questions");
                 });
@@ -396,6 +414,25 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("SubjectId");
                 });
 
+            modelBuilder.Entity("Core.Entities.ExamQuestion", b =>
+                {
+                    b.HasOne("Core.Entities.Exam", "Exam")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Entities.Question", "Question")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("Core.Entities.ExamResult", b =>
                 {
                     b.HasOne("Core.Entities.AppUser", "AppUser")
@@ -417,9 +454,9 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Question", b =>
                 {
-                    b.HasOne("Core.Entities.Exam", null)
+                    b.HasOne("Core.Entities.Subject", null)
                         .WithMany("Questions")
-                        .HasForeignKey("ExamId");
+                        .HasForeignKey("SubjectId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -480,17 +517,21 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Exam", b =>
                 {
-                    b.Navigation("Questions");
+                    b.Navigation("ExamQuestions");
                 });
 
             modelBuilder.Entity("Core.Entities.Question", b =>
                 {
                     b.Navigation("Answers");
+
+                    b.Navigation("ExamQuestions");
                 });
 
             modelBuilder.Entity("Core.Entities.Subject", b =>
                 {
                     b.Navigation("Exams");
+
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

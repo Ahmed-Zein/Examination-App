@@ -1,3 +1,5 @@
+using Application.Interfaces;
+using Application.Services;
 using Core.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

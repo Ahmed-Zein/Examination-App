@@ -13,10 +13,15 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
     public DbSet<Question> Questions { get; set; }
     public DbSet<Answer> Answers { get; set; }
     public DbSet<Subject> Subjects { get; set; }
+    public DbSet<ExamQuestion> ExamQuestions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ExamQuestion>().HasKey(e => new { e.QuestionId, e.ExamId });
+        modelBuilder.Entity<ExamQuestion>().HasOne<Exam>(e => e.Exam).WithMany(e => e.ExamQuestions);
+        modelBuilder.Entity<ExamQuestion>().HasOne<Question>(e => e.Question).WithMany(e => e.ExamQuestions);
 
         List<IdentityRole> roles =
         [

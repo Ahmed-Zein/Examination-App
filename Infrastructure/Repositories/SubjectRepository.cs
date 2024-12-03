@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class SubjectRepository(AppDbContext context, IMapper mapper) : ISubjectRepository
+public class SubjectRepository(AppDbContext context) : ISubjectRepository
 {
     public async Task<bool> AnyAsync(int id)
     {
@@ -43,7 +43,7 @@ public class SubjectRepository(AppDbContext context, IMapper mapper) : ISubjectR
         var subject = subjectResult.Value;
 
         subject.Name = toUpdate.Name;
-        
+
         return Result.Ok(subject);
     }
 }

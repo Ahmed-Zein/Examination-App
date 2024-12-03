@@ -6,6 +6,7 @@ public class Question : BaseModel
 {
     public string Text { get; set; } = string.Empty;
     public List<Answer> Answers { get; set; } = [];
+    public List<ExamQuestion> ExamQuestions { get; set; } = [];
 }
 
 public class Answer : BaseModel
