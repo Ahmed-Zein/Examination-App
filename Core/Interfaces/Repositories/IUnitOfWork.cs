@@ -1,6 +1,9 @@
-namespace Core.Repositories;
+using Core.Repositories;
 
-public class IUnitOfWork
+namespace Core.Interfaces.Repositories;
+
+public interface IUnitOfWork
 {
-    
+    ISubjectRepository SubjectRepository { get; }
+    IStudentRepository StudentRepository { get; }
 }
