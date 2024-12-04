@@ -13,4 +13,15 @@ public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager) 
     public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
 
     public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(userManager);
+
+    public async Task CommitAsync()
+    {
+        await context.SaveChangesAsync();
+    }
+
+    public void Dispose()
+    {
+        context.Dispose();
+        userManager.Dispose();
+    }
 }

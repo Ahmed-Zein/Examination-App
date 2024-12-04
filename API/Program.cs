@@ -48,6 +48,7 @@ builder.Services.AddAutoMapper(typeof(AppMappersProfiles));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IStudentServices, StudentServices>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

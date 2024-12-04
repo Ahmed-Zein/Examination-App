@@ -21,7 +21,11 @@ public class SubjectRepository(AppDbContext context) : ISubjectRepository
     public async Task<Result<Subject>> GetByIdAsync(int id)
     {
         var subject = await context.Subjects.FindAsync(id);
-        return subject is null ? Result.Fail<Subject>("Subject not found") : Result.Ok(subject);
+        return subject switch
+        {
+            null => Result.Fail<Subject>("Subject not found"),
+            _ => Result.Ok(subject),
+        };
     }
 
     public void Delete(Subject entity)
@@ -39,8 +43,8 @@ public class SubjectRepository(AppDbContext context) : ISubjectRepository
         var subjectResult = await GetByIdAsync(id);
         if (subjectResult.IsFailed)
             return subjectResult;
-        var subject = subjectResult.Value;
 
+        var subject = subjectResult.Value;
         subject.Name = toUpdate.Name;
 
         return Result.Ok(subject);
