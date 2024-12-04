@@ -30,6 +30,19 @@ public class AnswerRepository(AppDbContext context) : IAnswerRepository
         context.Answers.Remove(entity);
     }
 
+    public async Task AddManyAsync(List<Answer> answers, Question question)
+    {
+        List<Task> answersTask = [];
+        answers.ForEach(
+            answer =>
+            {
+                answer.Question = question;
+                answersTask.Add(AddAsync(answer));
+            }
+        );
+        await Task.WhenAll(answersTask);
+    }
+
     public async Task AddAsync(Answer entity)
     {
         await context.Answers.AddAsync(entity);

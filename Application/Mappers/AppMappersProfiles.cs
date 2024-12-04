@@ -28,10 +28,14 @@ public class AppMappersProfiles : Profile
     private void _answerMapper()
     {
         CreateMap<Answer, AnswerDto>();
+        CreateMap<AnswerDto, Answer>();
+        CreateMap<CreateAnswerDto, Answer>();
     }
 
     private void _questionMapper()
     {
         CreateMap<Question, QuestionDto>();
+        CreateMap<QuestionDto, Question>();
+        CreateMap<CreateQuestionDto, Question>();
     }
 }
