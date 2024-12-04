@@ -1,3 +1,5 @@
+using API.Models;
+using Application.DTOs;
 using Application.Interfaces;
 using Core.Constants;
 using Microsoft.AspNetCore.Authorization;
@@ -11,20 +13,21 @@ namespace API.Controller;
 public class AdminController(IStudentServices studentServices) : ControllerBase
 {
     [HttpGet("/students")]
-    public async Task<ActionResult> GetAllStudents()
+    public async Task<ActionResult<JsonResponse<List<StudentDto>>>> GetAllStudents()
     {
-        return Ok(await studentServices.GetAllAsync());
+        var students = await studentServices.GetAllAsync();
+        return Ok(JsonResponse<List<StudentDto>>.Ok(students));
     }
 
     [HttpGet("/students/{studentId}")]
-    public async Task<ActionResult> GetByStudentId(string studentId)
+    public async Task<ActionResult<JsonResponse<StudentDto>>> GetByStudentId(string studentId)
     {
         var studentResult = await studentServices.GetByIdAsync(studentId);
 
         return studentResult.IsSuccess switch
         {
-            true => Ok(studentResult.Value),
-            false => BadRequest(studentResult.Errors)
+            true => Ok(JsonResponse<StudentDto>.Ok(studentResult.Value)),
+            false => BadRequest(JsonResponse<StudentDto>.Error(studentResult.Errors))
         };
     }
 }
