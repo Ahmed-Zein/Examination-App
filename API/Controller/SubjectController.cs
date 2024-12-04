@@ -1,3 +1,4 @@
+using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
 using Core.Constants;
@@ -12,38 +13,43 @@ namespace API.Controller;
 public class SubjectController(ISubjectService subjectService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<SubjectDto>>> Get()
+    public async Task<ActionResult<JsonResponse<List<SubjectDto>>>> Get()
     {
-        return Ok(await subjectService.GetAllSubjects());
+        var subjects = await subjectService.GetAllSubjects();
+
+        return Ok(JsonResponse<List<SubjectDto>>.Ok(subjects));
     }
 
+
     [HttpGet("{subjectId:int:min(1)}")]
-    public async Task<ActionResult<SubjectDto>> GetById(int subjectId)
+    public async Task<ActionResult<JsonResponse<SubjectDto>>> GetById(int subjectId)
     {
         var subjectResult = await subjectService.GetById(subjectId);
         return subjectResult switch
         {
-            { IsSuccess: true } => Ok(subjectResult.Value),
-            { IsSuccess: false } => NotFound(subjectResult.Errors)
+            { IsSuccess: true } => Ok(JsonResponse<SubjectDto>.Ok(subjectResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(subjectResult.Errors))
         };
     }
 
     [HttpPost]
     [Authorize(Roles = AuthRolesConstants.Admin)]
-    public async Task<ActionResult<SubjectDto>> AddSubject([FromBody] CreateSubjectDto createSubjectDto)
+    public async Task<ActionResult<JsonResponse<SubjectDto>>> AddSubject([FromBody] CreateSubjectDto createSubjectDto)
     {
-        return Ok(await subjectService.CreateSubject(createSubjectDto));
+        var createdSubject = await subjectService.CreateSubject(createSubjectDto);
+        return Ok(JsonResponse<SubjectDto>.Ok(createdSubject));
     }
 
     [HttpPut("{subjectId:int:min(1)}")]
     [Authorize(Roles = AuthRolesConstants.Admin)]
-    public async Task<ActionResult<SubjectDto>> AddSubject([FromBody] UpdateSubjectDto updateSubjectDto, int subjectId)
+    public async Task<ActionResult<JsonResponse<SubjectDto>>> AddSubject([FromBody] UpdateSubjectDto updateSubjectDto,
+        int subjectId)
     {
         var updateSubjectResult = await subjectService.UpdateSubject(updateSubjectDto, subjectId);
         return updateSubjectResult switch
         {
-            { IsSuccess: true } => Ok(updateSubjectResult.Value),
-            { IsSuccess: false } => NotFound(updateSubjectResult.Errors)
+            { IsSuccess: true } => Ok(JsonResponse<SubjectDto>.Ok(updateSubjectResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(updateSubjectResult.Errors))
         };
     }
 }
