@@ -8,8 +8,10 @@ public class AppMappersProfiles : Profile
 {
     public AppMappersProfiles()
     {
-        _studentMapper();
+        _answerMapper();
         _subjectMapper();
+        _studentMapper();
+        _questionMapper();
     }
 
     private void _studentMapper()
@@ -21,5 +23,15 @@ public class AppMappersProfiles : Profile
     {
         CreateMap<Subject, SubjectDto>();
         CreateMap<CreateSubjectDto, Subject>();
+    }
+
+    private void _answerMapper()
+    {
+        CreateMap<Answer, AnswerDto>();
+    }
+
+    private void _questionMapper()
+    {
+        CreateMap<Question, QuestionDto>();
     }
 }

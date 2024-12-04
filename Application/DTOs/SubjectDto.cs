@@ -1,11 +1,9 @@
-using Core.Entities;
-
 namespace Application.DTOs;
 
 public class SubjectDto : CreateSubjectDto
 {
     public int Id { get; set; }
-    public List<Question> Questions { get; set; } = [];
+    public List<QuestionDto> Questions { get; set; } = [];
 }
 
 public class CreateSubjectDto
