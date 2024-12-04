@@ -8,18 +8,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controller;
 
 [ApiController]
-[Route("api/admin")]
+[Route("api/students")]
 [Authorize(Roles = AuthRolesConstants.Admin)]
-public class AdminController(IStudentServices studentServices) : ControllerBase
+public class StudentController(IStudentServices studentServices) : ControllerBase
 {
-    [HttpGet("/students")]
+    [HttpGet]
     public async Task<ActionResult<JsonResponse<List<StudentDto>>>> GetAllStudents()
     {
         var students = await studentServices.GetAllAsync();
         return Ok(JsonResponse<List<StudentDto>>.Ok(students));
     }
 
-    [HttpGet("/students/{studentId}")]
+    [HttpGet("{studentId}")]
     public async Task<ActionResult<JsonResponse<StudentDto>>> GetByStudentId(string studentId)
     {
         var studentResult = await studentServices.GetByIdAsync(studentId);

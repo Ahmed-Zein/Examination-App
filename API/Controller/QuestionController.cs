@@ -1,13 +1,14 @@
 using API.Models;
 using Application.DTOs;
 using Application.Services;
+using Core.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controller;
 
-[Authorize]
 [ApiController]
+[Authorize(Roles = AuthRolesConstants.Admin)]
 [Route("api/subjects/{subjectId:int:min(1)}/questions")]
 public class QuestionController(IQuestionService questionService) : ControllerBase
 {
