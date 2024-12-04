@@ -21,8 +21,7 @@ public sealed class AuthService(UserManager<AppUser> userManager, ITokenService 
 
         var identityResult = await userManager.CreateAsync(user, registerRequestDto.Password);
         if (!identityResult.Succeeded)
-            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description))
-                .WithValue(_failResponse(identityResult.Errors));
+            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description));
 
         List<string> roles = [AuthRolesConstants.Student];
         identityResult = await userManager.AddToRolesAsync(user, roles);
@@ -30,8 +29,7 @@ public sealed class AuthService(UserManager<AppUser> userManager, ITokenService 
         if (!identityResult.Succeeded)
         {
             await userManager.DeleteAsync(user); // roll back
-            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description))
-                .WithValue(_failResponse(identityResult.Errors));
+            return Result.Fail<AuthenticationResponseDto>(identityResult.Errors.Select(e => e.Description));
         }
 
         var token = tokenService.GenerateToken(user, roles);
@@ -43,8 +41,7 @@ public sealed class AuthService(UserManager<AppUser> userManager, ITokenService 
         var credentialsResult = await CheckCredentials(loginRequestDto.Email, loginRequestDto.Password);
 
         if (credentialsResult.IsFailed)
-            return Result.Fail<AuthenticationResponseDto>(credentialsResult.Errors)
-                .WithValue(_failResponse(credentialsResult.Errors));
+            return Result.Fail<AuthenticationResponseDto>(credentialsResult.Errors);
 
         var user = credentialsResult.Value;
         var roles = await userManager.GetRolesAsync(user);
@@ -67,20 +64,6 @@ public sealed class AuthService(UserManager<AppUser> userManager, ITokenService 
     {
         return
             new AuthenticationResponseDto()
-                { Success = true, Message = message, Token = token };
-    }
-
-    private static AuthenticationResponseDto _failResponse(List<IError> errors)
-    {
-        return
-            new AuthenticationResponseDto()
-                { Success = false, Errors = errors.Select(e => e.Message).ToList() };
-    }
-
-    private static AuthenticationResponseDto _failResponse(IEnumerable<IdentityError> errors)
-    {
-        return
-            new AuthenticationResponseDto()
-                { Success = false, Errors = errors.Select(e => e.Description).ToList() };
+                { Message = message, Token = token };
     }
 }
