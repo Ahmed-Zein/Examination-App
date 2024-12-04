@@ -1,6 +1,5 @@
-using AutoMapper;
 using Core.Entities;
-using Core.Repositories;
+using Core.Interfaces.Repositories;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

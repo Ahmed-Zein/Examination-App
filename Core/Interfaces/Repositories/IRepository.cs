@@ -1,15 +1,15 @@
 using FluentResults;
 
-namespace Core.Repositories;
+namespace Core.Interfaces.Repositories;
 
 public interface IRepository<T, in TP>
 {
     Task<bool> AnyAsync(TP id);
 
     Task<List<T>> GetAllAsync();
-    Task<Result<T>> GetByIdAsync(int id);
+    Task<Result<T>> GetByIdAsync(TP id);
 
     void Delete(T entity);
     Task AddAsync(T entity);
-    Task<Result<T>> UpdateAsync(int id, T toUpdate);
+    Task<Result<T>> UpdateAsync(TP id, T toUpdate);
 }

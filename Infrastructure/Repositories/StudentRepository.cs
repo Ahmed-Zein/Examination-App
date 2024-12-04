@@ -1,40 +1,26 @@
+using Core.Constants;
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using FluentResults;
-using Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Repositories;
 
-// TODO:
-public class StudentRepository(AppDbContext context) : IStudentRepository
+public class StudentRepository(UserManager<AppUser> userManager) : IStudentRepository
 {
-    public Task<bool> AnyAsync(int id)
+    public async Task<List<AppUser>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var students = (List<AppUser>)await userManager.GetUsersInRoleAsync(AuthRolesConstants.Student);
+        return students;
     }
 
-    public Task<List<AppUser>> GetAllAsync()
+    public async Task<Result<AppUser>> GetByIdAsync(string id)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<Result<AppUser>> GetByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Delete(AppUser entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task AddAsync(AppUser entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Result<AppUser>> UpdateAsync(int id, AppUser toUpdate)
-    {
-        throw new NotImplementedException();
+        var user = await userManager.FindByIdAsync(id);
+        return user switch
+        {
+            null => Result.Fail<AppUser>("User not found"),
+            _ => Result.Ok(user)
+        };
     }
 }

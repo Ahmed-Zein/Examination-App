@@ -1,6 +1,6 @@
 using Core.Entities;
 
-namespace Core.Repositories;
+namespace Core.Interfaces.Repositories;
 
 public interface ISubjectRepository : IRepository<Subject, int>
 {

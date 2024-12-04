@@ -1,5 +1,3 @@
-using Core.Repositories;
-
 namespace Core.Interfaces.Repositories;
 
 public interface IUnitOfWork
