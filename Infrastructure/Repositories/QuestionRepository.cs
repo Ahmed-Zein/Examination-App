@@ -49,4 +49,15 @@ public class QuestionRepository(AppDbContext context) : IQuestionRepository
 
         return questionResult;
     }
+
+    public async Task<List<int>> GetQuestionsIdBySubject(int subjectId)
+    {
+        return await context.Questions.Where(q => q.SubjectId == subjectId).Select(q => q.Id).ToListAsync();
+    }
+
+    public async Task<List<int>> GetQuestionsIdByExam(int examId)
+    {
+        return await context.ExamQuestions.Where(e => e.ExamId == examId)
+            .Select(question => question.QuestionId).ToListAsync();
+    }
 }

@@ -65,4 +65,15 @@ public class ExamRepository(AppDbContext context) : IExamRepository
             .FirstOrDefaultAsync();
         return exams ?? [];
     }
+
+    public async Task AddQuestionsToExam(int examId, List<int> questionIds)
+    {
+        await context.ExamQuestions.AddRangeAsync(questionIds.Select(id => new ExamQuestion
+            { ExamId = examId, QuestionId = id }));
+    }
+
+    public async Task<bool> ExamExistsForSubject(int subjectId, int examId)
+    {
+        return await context.Subjects.Where(s => s.Exams.Any(e => e.Id == examId)).AnyAsync(e => e.Id == subjectId);
+    }
 }

@@ -8,7 +8,8 @@ using FluentResults;
 
 namespace Application.Services;
 
-public class ExamService(IUnitOfWork unitOfWork, IMapper mapper) : IExamService
+public class ExamService(IUnitOfWork unitOfWork, AddQuestionToExamValidator questionToExamValidator, IMapper mapper)
+    : IExamService
 {
     private readonly IExamRepository _examRepository = unitOfWork.ExamRepository;
 
@@ -58,5 +59,22 @@ public class ExamService(IUnitOfWork unitOfWork, IMapper mapper) : IExamService
 
         var examsResult = await _examRepository.GetByIdAsync(examIds[randomIndex]);
         return Result.Ok(mapper.Map<ExamDto>(examsResult.Value));
+    }
+
+    public async Task<Result> AddQuestionToExam(AddQuestionToExamDto questionDto)
+    {
+        var validationResult = await questionToExamValidator.ValidateAsync(questionDto);
+        if (!validationResult.IsValid)
+            return Result.Fail(validationResult.Errors.Select(error => error.ErrorMessage));
+
+        if (!await _examRepository.ExamExistsForSubject(questionDto.SubjectId, questionDto.ExamId))
+        {
+            return Result.Fail("The exam doesn't exists for the given subject");
+        }
+
+        await _examRepository.AddQuestionsToExam(questionDto.ExamId, questionDto.QuestionIds);
+        await unitOfWork.CommitAsync();
+
+        return Result.Ok();
     }
 }
