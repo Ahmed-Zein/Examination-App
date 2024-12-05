@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.Interfaces;
 using Application.Validators;
 using AutoMapper;
 using Core.Entities;
@@ -6,12 +7,6 @@ using Core.Interfaces.Repositories;
 using FluentResults;
 
 namespace Application.Services;
-
-public interface IQuestionService
-{
-    Task<Result<QuestionDto>> AddQuestion(CreateQuestionDto questionDto, int subjectId);
-    Task<Result<QuestionDto>> GetQuestion(int questionId);
-}
 
 public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestionService
 {

@@ -8,15 +8,17 @@ namespace Infrastructure.Repositories;
 
 public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager) : IUnitOfWork
 {
+    private IExamRepository? _examRepository;
+    private IAnswerRepository? _answerRepository;
     private ISubjectRepository? _subjectRepository;
     private IStudentRepository? _studentRepository;
     private IQuestionRepository? _questionRepository;
-    private IAnswerRepository? _answerRepository;
 
-    public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
-    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(userManager);
-    public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
+    public IExamRepository ExamRepository => _examRepository ??= new ExamRepository(context);
     public IAnswerRepository AnswerRepository => _answerRepository ??= new AnswerRepository(context);
+    public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
+    public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
+    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(userManager);
 
     public async Task CommitAsync()
     {

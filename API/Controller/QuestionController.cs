@@ -1,5 +1,6 @@
 using API.Models;
 using Application.DTOs;
+using Application.Interfaces;
 using Application.Services;
 using Core.Constants;
 using Microsoft.AspNetCore.Authorization;

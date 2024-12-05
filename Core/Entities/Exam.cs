@@ -7,6 +7,7 @@ public class Exam : BaseModel
 {
     public TimeSpan Duration { get; set; }
 
+    public string ModelName { get; set; } = string.Empty;
     public List<ExamQuestion> ExamQuestions { get; set; }
 }
 

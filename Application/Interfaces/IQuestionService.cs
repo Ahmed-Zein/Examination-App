@@ -1,7 +1,7 @@
 using Application.DTOs;
 using FluentResults;
 
-namespace Application.Services;
+namespace Application.Interfaces;
 
 public interface IQuestionService
 {
