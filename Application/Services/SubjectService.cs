@@ -28,14 +28,18 @@ public class SubjectService(IUnitOfWork unitOfWork, IMapper mapper) : ISubjectSe
         };
     }
 
-    public async Task<SubjectDto> CreateSubject(CreateSubjectDto subjectDto)
+    public async Task<List<SubjectDto>> CreateSubject(List<CreateSubjectDto> subjectDto)
     {
-        var subject = mapper.Map<Subject>(subjectDto);
+        var subjects = mapper.Map<List<Subject>>(subjectDto);
 
-        await _subjectRepository.AddAsync(subject);
+        foreach (var subject in subjects)
+        {
+            await _subjectRepository.AddAsync(subject);
+        }
+
         await unitOfWork.CommitAsync();
 
-        return mapper.Map<SubjectDto>(subject);
+        return mapper.Map<List<SubjectDto>>(subjects);
     }
 
     public async Task<Result<SubjectDto>> UpdateSubject(UpdateSubjectDto subjectDto, int id)

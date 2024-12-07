@@ -34,10 +34,11 @@ public class SubjectController(ISubjectService subjectService) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = AuthRolesConstants.Admin)]
-    public async Task<ActionResult<JsonResponse<SubjectDto>>> AddSubject([FromBody] CreateSubjectDto createSubjectDto)
+    public async Task<ActionResult<JsonResponse<SubjectDto>>> AddSubject(
+        [FromBody] List<CreateSubjectDto> createSubjectDto)
     {
         var createdSubject = await subjectService.CreateSubject(createSubjectDto);
-        return Ok(JsonResponse<SubjectDto>.Ok(createdSubject));
+        return Ok(JsonResponse<List<SubjectDto>>.Ok(createdSubject));
     }
 
     [HttpPut("{subjectId:int:min(1)}")]
