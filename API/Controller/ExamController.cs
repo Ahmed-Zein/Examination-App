@@ -1,15 +1,18 @@
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controller;
 
-[Route("api/subjects/{subjectId:int:min(0)}/exams")]
+[Authorize]
 [ApiController]
+[Route("api/subjects/{subjectId:int:min(0)}/exams")]
 public class ExamController(IExamService examService) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<JsonResponse<List<ExamDto>>>> Get(int subjectId)
     {
         var examResult = await examService.GetExams(subjectId);
@@ -22,6 +25,7 @@ public class ExamController(IExamService examService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<JsonResponse<ExamDto>>> AddExam([FromBody] CreateExamDto examDto, int subjectId)
     {
         var createdExamResult = await examService.CreateExam(examDto, subjectId);
@@ -33,6 +37,7 @@ public class ExamController(IExamService examService) : ControllerBase
     }
 
     [HttpPost("add")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<JsonResponse<object>>> AddQuestion([FromBody] AddQuestionToExamDto questionIds,
         int subjectId)
     {
@@ -48,6 +53,7 @@ public class ExamController(IExamService examService) : ControllerBase
     [HttpGet("{examId:int:min(0)}")]
     public async Task<ActionResult<JsonResponse<ExamDto>>> GetExam(int subjectId, int examId)
     {
+        // TODO: Add endpoint to get exam details
         return Ok();
     }
 }
