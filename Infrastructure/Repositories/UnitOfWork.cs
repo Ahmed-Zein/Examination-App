@@ -1,6 +1,6 @@
+using Application.Interfaces.Persistence;
 using Core.Entities;
 using Core.Interfaces;
-using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 

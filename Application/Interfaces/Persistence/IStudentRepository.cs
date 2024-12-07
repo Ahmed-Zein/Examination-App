@@ -1,7 +1,7 @@
 using Core.Entities;
 using FluentResults;
 
-namespace Core.Interfaces.Repositories;
+namespace Application.Interfaces.Persistence;
 
 public interface IStudentRepository
 {

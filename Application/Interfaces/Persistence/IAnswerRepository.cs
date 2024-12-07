@@ -1,7 +1,6 @@
 using Core.Entities;
-using Core.Interfaces.Repositories;
 
-namespace Core.Interfaces;
+namespace Application.Interfaces.Persistence;
 
 public interface IAnswerRepository : IRepository<Answer, int>
 {

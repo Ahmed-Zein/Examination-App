@@ -1,5 +1,5 @@
+using Application.Interfaces.Persistence;
 using Core.Entities;
-using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Hosting;

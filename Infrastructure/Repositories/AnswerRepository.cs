@@ -1,3 +1,4 @@
+using Application.Interfaces.Persistence;
 using Core.Entities;
 using Core.Interfaces;
 using FluentResults;
