@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241205000604_addModleNameForExam")]
-    partial class addModleNameForExam
+    [Migration("20241207124725_ch1.0")]
+    partial class ch10
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -138,29 +138,46 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("ModelName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("SubjectId")
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubjectId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ModelName");
+
                     b.HasIndex("SubjectId");
+
+                    b.HasIndex("SubjectId1");
 
                     b.ToTable("Exams");
                 });
 
             modelBuilder.Entity("Core.Entities.ExamQuestion", b =>
                 {
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
 
-                    b.HasKey("QuestionId", "ExamId");
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("ExamId");
+                    b.Property<int>("ExamId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId1")
+                        .HasColumnType("int");
+
+                    b.HasKey("ExamId", "QuestionId");
+
+                    b.HasIndex("ExamId1");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("QuestionId1");
 
                     b.ToTable("ExamQuestions");
                 });
@@ -177,6 +194,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("AppUserId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
 
@@ -189,8 +210,8 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentScore")
-                        .HasColumnType("int");
+                    b.Property<decimal>("StudentScore")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TotalScore")
                         .HasColumnType("int");
@@ -198,6 +219,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
+
+                    b.HasIndex("AppUserId1");
 
                     b.HasIndex("ExamId");
 
@@ -215,6 +238,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SubjectId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -222,6 +248,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SubjectId");
+
+                    b.HasIndex("SubjectId1");
 
                     b.ToTable("Questions");
                 });
@@ -416,22 +444,42 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Exam", b =>
                 {
+                    b.HasOne("Core.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Core.Entities.Subject", null)
                         .WithMany("Exams")
-                        .HasForeignKey("SubjectId");
+                        .HasForeignKey("SubjectId1");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Core.Entities.ExamQuestion", b =>
                 {
-                    b.HasOne("Core.Entities.Exam", "Exam")
+                    b.HasOne("Core.Entities.Exam", null)
                         .WithMany("ExamQuestions")
                         .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Core.Entities.Exam", "Exam")
+                        .WithMany()
+                        .HasForeignKey("ExamId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Entities.Question", "Question")
+                    b.HasOne("Core.Entities.Question", null)
                         .WithMany("ExamQuestions")
                         .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Core.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -442,16 +490,22 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.ExamResult", b =>
                 {
-                    b.HasOne("Core.Entities.AppUser", "AppUser")
+                    b.HasOne("Core.Entities.AppUser", null)
                         .WithMany("ExamResults")
                         .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Core.Entities.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Entities.Exam", "Exam")
-                        .WithMany()
+                        .WithMany("ExamResults")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("AppUser");
@@ -462,10 +516,14 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.Question", b =>
                 {
                     b.HasOne("Core.Entities.Subject", "Subject")
-                        .WithMany("Questions")
+                        .WithMany()
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Core.Entities.Subject", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("SubjectId1");
 
                     b.Navigation("Subject");
                 });
@@ -529,6 +587,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.Exam", b =>
                 {
                     b.Navigation("ExamQuestions");
+
+                    b.Navigation("ExamResults");
                 });
 
             modelBuilder.Entity("Core.Entities.Question", b =>

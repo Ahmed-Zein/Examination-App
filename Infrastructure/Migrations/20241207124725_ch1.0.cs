@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addModleNameForExam : Migration
+    public partial class ch10 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -180,8 +180,9 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Duration = table.Column<TimeSpan>(type: "time", nullable: false),
-                    ModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SubjectId = table.Column<int>(type: "int", nullable: true)
+                    ModelName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SubjectId = table.Column<int>(type: "int", nullable: false),
+                    SubjectId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -189,6 +190,11 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Exams_Subjects_SubjectId",
                         column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Exams_Subjects_SubjectId1",
+                        column: x => x.SubjectId1,
                         principalTable: "Subjects",
                         principalColumn: "Id");
                 });
@@ -200,7 +206,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SubjectId = table.Column<int>(type: "int", nullable: false)
+                    SubjectId = table.Column<int>(type: "int", nullable: false),
+                    SubjectId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -209,8 +216,12 @@ namespace Infrastructure.Migrations
                         name: "FK_Questions_Subjects_SubjectId",
                         column: x => x.SubjectId,
                         principalTable: "Subjects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Questions_Subjects_SubjectId1",
+                        column: x => x.SubjectId1,
+                        principalTable: "Subjects",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -220,11 +231,12 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TotalScore = table.Column<int>(type: "int", nullable: false),
-                    StudentScore = table.Column<int>(type: "int", nullable: false),
+                    StudentScore = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AppUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AppUserId1 = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -234,14 +246,18 @@ namespace Infrastructure.Migrations
                         name: "FK_ExamResults_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ExamResults_AspNetUsers_AppUserId1",
+                        column: x => x.AppUserId1,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ExamResults_Exams_ExamId",
                         column: x => x.ExamId,
                         principalTable: "Exams",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -270,20 +286,32 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     ExamId = table.Column<int>(type: "int", nullable: false),
-                    QuestionId = table.Column<int>(type: "int", nullable: false)
+                    QuestionId = table.Column<int>(type: "int", nullable: false),
+                    ExamId1 = table.Column<int>(type: "int", nullable: false),
+                    QuestionId1 = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExamQuestions", x => new { x.QuestionId, x.ExamId });
+                    table.PrimaryKey("PK_ExamQuestions", x => new { x.ExamId, x.QuestionId });
                     table.ForeignKey(
                         name: "FK_ExamQuestions_Exams_ExamId",
                         column: x => x.ExamId,
+                        principalTable: "Exams",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ExamQuestions_Exams_ExamId1",
+                        column: x => x.ExamId1,
                         principalTable: "Exams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ExamQuestions_Questions_QuestionId",
                         column: x => x.QuestionId,
+                        principalTable: "Questions",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ExamQuestions_Questions_QuestionId1",
+                        column: x => x.QuestionId1,
                         principalTable: "Questions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -352,9 +380,19 @@ namespace Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamQuestions_ExamId",
+                name: "IX_ExamQuestions_ExamId1",
                 table: "ExamQuestions",
-                column: "ExamId");
+                column: "ExamId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamQuestions_QuestionId",
+                table: "ExamQuestions",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamQuestions_QuestionId1",
+                table: "ExamQuestions",
+                column: "QuestionId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamResults_AppUserId",
@@ -362,9 +400,19 @@ namespace Infrastructure.Migrations
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExamResults_AppUserId1",
+                table: "ExamResults",
+                column: "AppUserId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExamResults_ExamId",
                 table: "ExamResults",
                 column: "ExamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exams_ModelName",
+                table: "Exams",
+                column: "ModelName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exams_SubjectId",
@@ -372,9 +420,19 @@ namespace Infrastructure.Migrations
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Exams_SubjectId1",
+                table: "Exams",
+                column: "SubjectId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Questions_SubjectId",
                 table: "Questions",
                 column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Questions_SubjectId1",
+                table: "Questions",
+                column: "SubjectId1");
         }
 
         /// <inheritdoc />

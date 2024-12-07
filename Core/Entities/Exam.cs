@@ -7,14 +7,17 @@ public class Exam : BaseModel
 {
     public TimeSpan Duration { get; set; }
     public string ModelName { get; set; } = string.Empty;
-    public List<ExamQuestion> ExamQuestions { get; set; }
+    public List<ExamResult> ExamResults { get; set; } = [];
+    public List<ExamQuestion> ExamQuestions { get; set; } = [];
+    public int SubjectId { get; set; }
+    public Subject Subject { get; set; }
 }
 
 public class ExamResult : BaseModel
 {
     [Range(0, int.MaxValue)] public int TotalScore { get; set; }
 
-    [Range(0, int.MaxValue)] public int StudentScore { get; set; }
+    [Range(0, 1000)] public decimal StudentScore { get; set; }
 
     public ExamResultStatus Status { get; set; } = ExamResultStatus.UnSubmitted;
 

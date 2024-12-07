@@ -18,12 +18,7 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Exam>().HasIndex(x => x.ModelName);
-
-        modelBuilder.Entity<ExamQuestion>().HasKey(e => new { e.QuestionId, e.ExamId });
-        modelBuilder.Entity<ExamQuestion>().HasOne<Exam>(e => e.Exam).WithMany(e => e.ExamQuestions);
-        modelBuilder.Entity<ExamQuestion>().HasOne<Question>(e => e.Question).WithMany(e => e.ExamQuestions);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         List<IdentityRole> roles =
         [
