@@ -37,7 +37,7 @@ public class AddQuestionToExamValidator : AbstractValidator<AddQuestionToExamDto
 
     private async Task<bool> _validateAgainstExam(AddQuestionToExamDto dto, CancellationToken _)
     {
-        var existingExamQuestions = await _unitOfWork.QuestionRepository.GetQuestionsIdByExam(dto.ExamId);
+        var existingExamQuestions = await _unitOfWork.QuestionRepository.GetIdByExam(dto.ExamId);
         return !dto.QuestionIds.Any(id => existingExamQuestions.Contains(id));
     }
 }

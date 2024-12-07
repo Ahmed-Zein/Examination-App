@@ -20,7 +20,8 @@ public class QuestionRepository(AppDbContext context) : IQuestionRepository
 
     public async Task<Result<Question>> GetByIdAsync(int id)
     {
-        var question = await context.Questions.FindAsync(id);
+        var query = context.Questions.Include(e => e.Answers);
+        var question = await query.FirstOrDefaultAsync(e => e.Id == id);
         return question switch
         {
             null => Result.Fail<Question>("Question not found"),
@@ -55,9 +56,15 @@ public class QuestionRepository(AppDbContext context) : IQuestionRepository
         return await context.Questions.Where(q => q.SubjectId == subjectId).Select(q => q.Id).ToListAsync();
     }
 
-    public async Task<List<int>> GetQuestionsIdByExam(int examId)
+    public async Task<List<int>> GetIdByExam(int examId)
     {
         return await context.ExamQuestions.Where(e => e.ExamId == examId)
             .Select(question => question.QuestionId).ToListAsync();
+    }
+
+    public Task<List<Question>> GetBySubjectId(int subjectId)
+    {
+        var query = context.Questions.Include(q => q.Answers).Where(q => q.SubjectId == subjectId);
+        return query.ToListAsync();
     }
 }

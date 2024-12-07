@@ -42,4 +42,10 @@ public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestion
             { IsSuccess: false } => questionResult.ToResult()
         };
     }
+
+    public async Task<List<QuestionDto>> GetBySubject(int subjectId)
+    {
+        var questions = await _questionRepository.GetBySubjectId(subjectId);
+        return mapper.Map<List<QuestionDto>>(questions);
+    }
 }

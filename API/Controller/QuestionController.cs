@@ -1,7 +1,6 @@
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
-using Application.Services;
 using Core.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,13 @@ namespace API.Controller;
 [Route("api/subjects/{subjectId:int:min(1)}/questions")]
 public class QuestionController(IQuestionService questionService) : ControllerBase
 {
+    [HttpGet]
+    public async Task<ActionResult<JsonResponse<List<QuestionDto>>>> GetQuestions(int subjectId)
+    {
+        var serviceResult = await questionService.GetBySubject(subjectId);
+        return Ok(JsonResponse<List<QuestionDto>>.Ok(serviceResult));
+    }
+
     [HttpGet("{questionId:int:min(1)}")]
     public async Task<ActionResult<JsonResponse<QuestionDto>>> GetById(int questionId, int subjectId)
     {
