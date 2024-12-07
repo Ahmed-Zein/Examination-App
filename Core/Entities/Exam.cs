@@ -11,6 +11,7 @@ public class Exam : BaseModel
     public List<ExamQuestion> ExamQuestions { get; set; } = [];
     public int SubjectId { get; set; }
     public Subject Subject { get; set; }
+    public List<Question> Questions { get; set; } = [];
 }
 
 public class ExamResult : BaseModel

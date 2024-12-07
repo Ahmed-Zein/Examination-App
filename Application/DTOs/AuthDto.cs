@@ -19,9 +19,21 @@ public class RegisterRequestDto : LoginRequestDto
 
 public class AuthenticationResponseDto
 {
-    // public bool Success { get; set; }
     public string Token { get; set; } = string.Empty;
 
     public string Message { get; set; } = string.Empty;
-    // public List<string> Errors { get; set; } = [];
+
+    public static AuthenticationResponseDto Success(string token, string message)
+    {
+        return
+            new AuthenticationResponseDto()
+                { Message = message, Token = token };
+    }
+
+    public static AuthenticationResponseDto Fail(string message)
+    {
+        return
+            new AuthenticationResponseDto()
+                { Message = message };
+    }
 }

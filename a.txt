@@ -1,0 +1,118 @@
+using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastructure.Data.Configurations;
+
+public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
+{
+    public void Configure(EntityTypeBuilder<AppUser> builder)
+    {
+        builder.HasKey(usr => usr.Id);
+
+        builder.Property(usr => usr.FirstName)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(usr => usr.LastName)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.HasMany(usr => usr.ExamResults)
+            .WithOne(examResult => examResult.AppUser)
+            // .HasForeignKey(examResult => examResult.AppUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastructure.Data.Configurations;
+
+public class ExamConfiguration : IEntityTypeConfiguration<Exam>
+{
+    public void Configure(EntityTypeBuilder<Exam> builder)
+    {
+        builder.HasKey(e => e.Id);
+        builder.HasIndex(e => e.ModelName);
+
+        builder.HasOne(exam => exam.Subject)
+            .WithMany(subject => subject.Exams)
+            .HasForeignKey(exam => exam.SubjectId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany(exam => exam.ExamResults)
+            .WithOne(examResult => examResult.Exam)
+            .HasForeignKey(examResult => examResult.ExamId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany(exam => exam.ExamQuestions)
+            .WithOne(examQuestion => examQuestion.Exam)
+            .HasForeignKey(examQuestion => examQuestion.ExamId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastructure.Data.Configurations;
+
+public class ExamQuestionConfiguration : IEntityTypeConfiguration<ExamQuestion>
+{
+    public void Configure(EntityTypeBuilder<ExamQuestion> builder)
+    {
+        builder.HasKey(eq => new { eq.ExamId, eq.QuestionId });
+        builder.HasOne<Exam>()
+            .WithMany(exam => exam.ExamQuestions)
+            // .HasForeignKey(exam => exam.ExamId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<Question>()
+            .WithMany(question => question.ExamQuestions)
+            // .HasForeignKey(exam => exam.QuestionId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastructure.Data.Configurations;
+
+public class ExamResultConfiguration : IEntityTypeConfiguration<ExamResult>
+{
+    public void Configure(EntityTypeBuilder<ExamResult> builder)
+    {
+        builder.HasKey(er => er.Id);
+
+        builder.HasOne<AppUser>()
+            .WithMany(usr => usr.ExamResults)
+            .HasForeignKey(er => er.AppUserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(er => er.Exam)
+            .WithMany(e => e.ExamResults)
+            .HasForeignKey(er => er.ExamId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastructure.Data.Configurations;
+
+public class SubjectConfiguration : IEntityTypeConfiguration<Subject>
+{
+    public void Configure(EntityTypeBuilder<Subject> builder)
+    {
+        builder.HasKey(e => e.Id);
+        builder.HasMany<Exam>()
+            .WithOne(exam => exam.Subject)
+            .HasForeignKey(exam => exam.SubjectId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany<Question>()
+            .WithOne(question => question.Subject)
+            .HasForeignKey(question => question.SubjectId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
-public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options)
 {
     public DbSet<Exam> Exams { get; set; }
     public DbSet<ExamResult> ExamResults { get; set; }
@@ -18,19 +18,38 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        // modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.Entity<ExamQuestion>().HasKey(e => new { ExamId = e.ExamId, QuestionId = e.QuestionId });
+        modelBuilder.Entity<Question>()
+            .HasMany(q => q.ExamQuestions)
+            .WithOne(q => q.Question)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        List<IdentityRole> roles =
-        [
-            new() { Id = "1", Name = AuthRolesConstants.Admin, NormalizedName = AuthRolesConstants.Admin.ToUpper() },
-            new() { Id = "2", Name = AuthRolesConstants.Student, NormalizedName = AuthRolesConstants.Student.ToUpper() }
-        ];
+        modelBuilder.Entity<Exam>()
+            .HasMany(q => q.ExamQuestions)
+            .WithOne(q => q.Exam)
+            .OnDelete(DeleteBehavior.NoAction);
+        var roles = new List<IdentityRole>
+        {
+            new()
+            {
+                Id = "1",
+                Name = AuthRolesConstants.Admin,
+                NormalizedName = AuthRolesConstants.Admin.ToUpper()
+            },
+            new()
+            {
+                Id = "2",
+                Name = AuthRolesConstants.Student,
+                NormalizedName = AuthRolesConstants.Student.ToUpper()
+            }
+        };
 
-        List<Subject> subjects =
-        [
+        var subjects = new List<Subject>
+        {
             new() { Id = 1, Name = "Math" },
             new() { Id = 2, Name = "Science" }
-        ];
+        };
 
         modelBuilder.Entity<IdentityRole>().HasData(roles);
         modelBuilder.Entity<Subject>().HasData(subjects);

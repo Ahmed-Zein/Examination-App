@@ -15,12 +15,12 @@ public class ExamController(IExamService examService) : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<JsonResponse<List<ExamDto>>>> Get(int subjectId)
     {
-        var examResult = await examService.GetExams(subjectId);
+        var serviceResult = await examService.GetExams(subjectId);
 
-        return examResult switch
+        return serviceResult switch
         {
-            { IsSuccess: true } => Ok(JsonResponse<List<ExamDto>>.Ok(examResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<List<ExamDto>>.Error(examResult.Errors))
+            { IsSuccess: true } => Ok(JsonResponse<List<ExamDto>>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<List<ExamDto>>.Error(serviceResult.Errors))
         };
     }
 
@@ -28,32 +28,37 @@ public class ExamController(IExamService examService) : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<JsonResponse<ExamDto>>> AddExam([FromBody] CreateExamDto examDto, int subjectId)
     {
-        var createdExamResult = await examService.CreateExam(examDto, subjectId);
-        return createdExamResult switch
+        var serviceResult = await examService.CreateExam(examDto, subjectId);
+        return serviceResult switch
         {
-            { IsSuccess: true } => Ok(JsonResponse<ExamDto>.Ok(createdExamResult.Value)),
-            { IsSuccess: false } => BadRequest(JsonResponse<ExamDto>.Error(createdExamResult.Errors))
+            { IsSuccess: true } => Ok(JsonResponse<ExamDto>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => BadRequest(JsonResponse<ExamDto>.Error(serviceResult.Errors))
         };
     }
 
-    [HttpPost("add")]
+    [HttpPost("{examId:int:min(1)}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<JsonResponse<object>>> AddQuestion([FromBody] AddQuestionToExamDto questionIds,
-        int subjectId)
+    public async Task<ActionResult<JsonResponse<object>>> AddQuestion([FromBody] List<int> questionIds,
+        int subjectId, int examId)
     {
-        var addQuestionsResult = await examService.AddQuestionToExam(questionIds);
-        return addQuestionsResult switch
+        var dto = new AddQuestionToExamDto { QuestionIds = questionIds, SubjectId = subjectId, ExamId = examId };
+        var serviceResult = await examService.AddQuestionToExam(dto);
+        return serviceResult switch
         {
-            { IsSuccess: true } => CreatedAtAction(nameof(GetExam), new { questionIds.ExamId, subjectId },
+            { IsSuccess: true } => CreatedAtAction(nameof(GetExam), new { dto.ExamId, subjectId },
                 JsonResponse<string>.Ok("", "Questions Added Successfully")),
-            { IsSuccess: false } => BadRequest(JsonResponse<object>.Error(addQuestionsResult.Errors))
+            { IsSuccess: false } => BadRequest(JsonResponse<object>.Error(serviceResult.Errors))
         };
     }
 
     [HttpGet("{examId:int:min(0)}")]
     public async Task<ActionResult<JsonResponse<ExamDto>>> GetExam(int subjectId, int examId)
     {
-        // TODO: Add endpoint to get exam details
-        return Ok();
+        var serviceResult = await examService.GetExamById(examId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => Ok(JsonResponse<ExamDto>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => BadRequest(JsonResponse<ExamDto>.Error(serviceResult.Errors))
+        };
     }
 }
