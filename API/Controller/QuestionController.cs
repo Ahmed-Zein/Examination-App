@@ -31,16 +31,17 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
     }
 
     [HttpPost]
-    public async Task<ActionResult<JsonResponse<QuestionDto>>> CreateQuestion(CreateQuestionDto createQuestionDto,
+    public async Task<ActionResult<JsonResponse<List<QuestionDto>>>> CreateQuestion(
+        [FromBody] List<CreateQuestionDto> createQuestionDto,
         int subjectId)
     {
         var createResult = await questionService.AddQuestion(createQuestionDto, subjectId);
         return createResult switch
         {
-            { IsSuccess: true } => CreatedAtAction(nameof(GetById),
-                new { questionId = createResult.Value.Id, subjectId },
-                JsonResponse<QuestionDto>.Ok(createResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<QuestionDto>.Error(createResult.Errors)),
+            { IsSuccess: true } => CreatedAtAction(nameof(GetQuestions),
+                new { subjectId },
+                JsonResponse<List<QuestionDto>>.Ok(createResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<List<QuestionDto>>.Error(createResult.Errors)),
         };
     }
 }

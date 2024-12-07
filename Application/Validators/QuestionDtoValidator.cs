@@ -21,6 +21,14 @@ public class CreateQuestionDtoValidator : AbstractValidator<CreateQuestionDto>
     }
 }
 
+public class CreateQuestionListDtoValidator : AbstractValidator<List<CreateQuestionDto>>
+{
+    public CreateQuestionListDtoValidator()
+    {
+        RuleForEach(x => x).SetValidator(new CreateQuestionDtoValidator());
+    }
+}
+
 public class CreateAnswerDtoValidator : AbstractValidator<CreateAnswerDto>
 {
     public CreateAnswerDtoValidator()

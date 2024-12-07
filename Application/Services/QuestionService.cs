@@ -5,6 +5,7 @@ using Application.Validators;
 using AutoMapper;
 using Core.Entities;
 using FluentResults;
+using FluentValidation;
 
 namespace Application.Services;
 
@@ -12,25 +13,28 @@ public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestion
 {
     private readonly IQuestionRepository _questionRepository = unitOfWork.QuestionRepository;
 
-    public async Task<Result<QuestionDto>> AddQuestion(CreateQuestionDto questionDto, int subjectId)
+    public async Task<Result<List<QuestionDto>>> AddQuestion(List<CreateQuestionDto> quetionsDto, int subjectId)
     {
-        var validator = new CreateQuestionDtoValidator();
-        var result = await validator.ValidateAsync(questionDto);
+        var validator = new CreateQuestionListDtoValidator();
+        var result = await validator.ValidateAsync(quetionsDto);
 
         if (!result.IsValid)
             return Result.Fail(result.Errors.Select(e => e.ErrorMessage));
 
         var subjectExists = await unitOfWork.SubjectRepository.AnyAsync(subjectId);
         if (!subjectExists)
-            return Result.Fail<QuestionDto>("Subject not found");
+            return Result.Fail("Subject not found");
 
-        var question = mapper.Map<Question>(questionDto);
-        question.SubjectId = subjectId;
+        var questions = mapper.Map<List<Question>>(quetionsDto);
+        foreach (var question in questions)
+        {
+            question.SubjectId = subjectId;
+            await _questionRepository.AddAsync(question);
+        }
 
-        await _questionRepository.AddAsync(question);
         await unitOfWork.CommitAsync();
 
-        return Result.Ok(mapper.Map<QuestionDto>(question));
+        return Result.Ok(mapper.Map<List<QuestionDto>>(questions));
     }
 
     public async Task<Result<QuestionDto>> GetQuestion(int questionId)
