@@ -20,10 +20,22 @@ public class ExamRepository(AppDbContext context) : IExamRepository
 
     public async Task<Result<Exam>> GetByIdAsync(int id)
     {
-        var query = context.Exams.Include(e => e.Questions)
-            .ThenInclude(q => q.Answers);
-        var exam = await query.FirstOrDefaultAsync(e => e.Id == id);
-        return exam is not null ? Result.Ok(exam) : Result.Fail<Exam>("Exam not found");
+        var exam = await context.Exams
+            .Include(e => e.Questions)
+            .ThenInclude(q => q.Answers)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (exam == null)
+            return Result.Fail("Exam not found");
+
+        var examQuestions = await context.ExamQuestions
+            .Where(e => e.ExamId == id)
+            .Include(q => q.Question)
+            .ThenInclude(q => q.Answers)
+            .ToListAsync();
+
+        exam.Questions = examQuestions.Select(e => e.Question).ToList();
+        return Result.Ok(exam);
     }
 
     public void Delete(Exam entity)
