@@ -9,5 +9,5 @@ public interface IExamService
     Task<Result<ExamDto>> GetExamById(int id);
     Task<Result<List<ExamDto>>> GetExams(int subjectId);
     Task<Result<ExamDto>> GetRandomExam(int subjectId);
-    Task<Result> AddQuestionToExam(AddQuestionToExamDto questionDto);
+    Task<Result> UpdateExamQestions(AddQuestionToExamDto questionDto);
 }

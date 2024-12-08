@@ -24,9 +24,9 @@ public class AddQuestionToExamValidator : AbstractValidator<AddQuestionToExamDto
 
         RuleFor(dto => dto)
             .MustAsync(_validateAgainstSubject)
-            .WithMessage("Some QuestionIds do not exist for the given subject.")
-            .MustAsync(_validateAgainstExam)
-            .WithMessage("Some QuestionIds already exist in this exam.");
+            .WithMessage("Some QuestionIds do not exist for the given subject.");
+        // .MustAsync(_validateAgainstExam)
+        // .WithMessage("Some QuestionIds already exist in this exam.");
     }
 
     private async Task<bool> _validateAgainstSubject(AddQuestionToExamDto dto, CancellationToken _)
@@ -35,9 +35,9 @@ public class AddQuestionToExamValidator : AbstractValidator<AddQuestionToExamDto
         return dto.QuestionIds.All(id => existingSubjectQuestions.Contains(id));
     }
 
-    private async Task<bool> _validateAgainstExam(AddQuestionToExamDto dto, CancellationToken _)
-    {
-        var existingExamQuestions = await _unitOfWork.QuestionRepository.GetIdByExam(dto.ExamId);
-        return !dto.QuestionIds.Any(id => existingExamQuestions.Contains(id));
-    }
+    // private async Task<bool> _validateAgainstExam(AddQuestionToExamDto dto, CancellationToken _)
+    // {
+    //     var existingExamQuestions = await _unitOfWork.QuestionRepository.GetIdByExam(dto.ExamId);
+    //     return !dto.QuestionIds.Any(id => existingExamQuestions.Contains(id));
+    // }
 }

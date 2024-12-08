@@ -13,7 +13,7 @@ public class ExamController(IExamService examService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<JsonResponse<List<ExamDto>>>> Get(int subjectId)
+    public async Task<ActionResult<JsonResponse<List<ExamDto>>>> GetAllExams(int subjectId)
     {
         var serviceResult = await examService.GetExams(subjectId);
 
@@ -26,7 +26,7 @@ public class ExamController(IExamService examService) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<JsonResponse<ExamDto>>> AddExam([FromBody] CreateExamDto examDto, int subjectId)
+    public async Task<ActionResult<JsonResponse<ExamDto>>> CreateExam([FromBody] CreateExamDto examDto, int subjectId)
     {
         var serviceResult = await examService.CreateExam(examDto, subjectId);
         return serviceResult switch
@@ -36,23 +36,23 @@ public class ExamController(IExamService examService) : ControllerBase
         };
     }
 
-    [HttpPost("{examId:int:min(1)}")]
+    [HttpPut("{examId:int:min(1)}")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<JsonResponse<object>>> AddQuestion([FromBody] List<int> questionIds,
+    public async Task<ActionResult<JsonResponse<object>>> UpdateExamQuestions([FromBody] List<int> questionIds,
         int subjectId, int examId)
     {
         var dto = new AddQuestionToExamDto { QuestionIds = questionIds, SubjectId = subjectId, ExamId = examId };
-        var serviceResult = await examService.AddQuestionToExam(dto);
+        var serviceResult = await examService.UpdateExamQestions(dto);
         return serviceResult switch
         {
-            { IsSuccess: true } => CreatedAtAction(nameof(GetExam), new { dto.ExamId, subjectId },
-                JsonResponse<string>.Ok("", "Questions Added Successfully")),
+            { IsSuccess: true } => CreatedAtAction(nameof(GetExamById), new { dto.ExamId, subjectId },
+                JsonResponse<string>.Ok("", "Questions updated Successfully.")),
             { IsSuccess: false } => BadRequest(JsonResponse<object>.Error(serviceResult.Errors))
         };
     }
 
     [HttpGet("{examId:int:min(0)}")]
-    public async Task<ActionResult<JsonResponse<ExamDto>>> GetExam(int subjectId, int examId)
+    public async Task<ActionResult<JsonResponse<ExamDto>>> GetExamById(int subjectId, int examId)
     {
         var serviceResult = await examService.GetExamById(examId);
         return serviceResult switch

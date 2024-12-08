@@ -29,6 +29,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             .HasMany(q => q.ExamQuestions)
             .WithOne(q => q.Exam)
             .OnDelete(DeleteBehavior.NoAction);
+
+        // Added to disambiguate the existence of two relations [Many2Many, One2Many] 
+        modelBuilder.Entity<Exam>()
+            .Ignore(e => e.Questions);
+
         var roles = new List<IdentityRole>
         {
             new()

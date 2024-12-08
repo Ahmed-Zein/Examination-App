@@ -1,6 +1,5 @@
 using Application.Interfaces.Persistence;
 using Core.Entities;
-using Core.Interfaces;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

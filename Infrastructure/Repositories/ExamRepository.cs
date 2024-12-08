@@ -21,8 +21,6 @@ public class ExamRepository(AppDbContext context) : IExamRepository
     public async Task<Result<Exam>> GetByIdAsync(int id)
     {
         var exam = await context.Exams
-            .Include(e => e.Questions)
-            .ThenInclude(q => q.Answers)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (exam == null)
@@ -79,10 +77,25 @@ public class ExamRepository(AppDbContext context) : IExamRepository
         return exams ?? [];
     }
 
-    public async Task AddQuestionsToExam(int examId, List<int> questionIds)
+    public async Task UpdateExamQuestions(int examId, List<int> newQuestions)
     {
-        await context.ExamQuestions.AddRangeAsync(questionIds.Select(id => new ExamQuestion
+        var existingQuestions = await context.ExamQuestions
+            .Where(e => e.ExamId == examId)
+            .Select(e => e.QuestionId)
+            .ToListAsync();
+
+        var questionToBeAdded = newQuestions.Except(existingQuestions).ToList();
+        var questionToBeRemoved = existingQuestions.Except(newQuestions).ToList();
+
+        // add the new questions;
+        var addingTask = context.ExamQuestions.AddRangeAsync(questionToBeAdded.Select(id => new ExamQuestion
             { ExamId = examId, QuestionId = id }));
+
+        // await removingTask;
+        context.ExamQuestions.RemoveRange(questionToBeRemoved.Select(id => new ExamQuestion
+            { ExamId = examId, QuestionId = id }));
+
+        await addingTask;
     }
 
     public async Task<bool> ExamExistsForSubject(int subjectId, int examId)

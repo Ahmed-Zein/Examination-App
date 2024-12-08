@@ -61,7 +61,7 @@ public class ExamService(IUnitOfWork unitOfWork, AddQuestionToExamValidator ques
         return Result.Ok(mapper.Map<ExamDto>(examsResult.Value));
     }
 
-    public async Task<Result> AddQuestionToExam(AddQuestionToExamDto questionDto)
+    public async Task<Result> UpdateExamQestions(AddQuestionToExamDto questionDto)
     {
         var validationResult = await questionToExamValidator.ValidateAsync(questionDto);
         if (!validationResult.IsValid)
@@ -70,7 +70,7 @@ public class ExamService(IUnitOfWork unitOfWork, AddQuestionToExamValidator ques
         if (!await _examRepository.ExamExistsForSubject(questionDto.SubjectId, questionDto.ExamId))
             return Result.Fail("The exam doesn't exists for the given subject");
 
-        await _examRepository.AddQuestionsToExam(questionDto.ExamId, questionDto.QuestionIds);
+        await _examRepository.UpdateExamQuestions(questionDto.ExamId, questionDto.QuestionIds);
         await unitOfWork.CommitAsync();
 
         return Result.Ok();
