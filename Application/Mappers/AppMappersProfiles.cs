@@ -23,24 +23,26 @@ public class AppMappersProfiles : Profile
     private void _subjectMapper()
     {
         CreateMap<Subject, SubjectDto>().ReverseMap();
-        CreateMap<CreateSubjectDto, Subject>().ReverseMap();
+        CreateMap<Subject, CreateSubjectDto>().ReverseMap();
     }
 
     private void _answerMapper()
     {
         CreateMap<Answer, AnswerDto>().ReverseMap();
-        CreateMap<CreateAnswerDto, Answer>().ReverseMap();
+        CreateMap<Answer, StudentAnswer>().ReverseMap();
+        CreateMap<Answer, CreateAnswerDto>().ReverseMap();
     }
 
     private void _questionMapper()
     {
         CreateMap<Question, QuestionDto>().ReverseMap();
-        CreateMap<CreateQuestionDto, Question>().ReverseMap();
+        CreateMap<Question, StudentQuestion>().ReverseMap();
     }
 
     private void _examMapper()
     {
         CreateMap<Exam, ExamDto>().ReverseMap();
-        CreateMap<CreateExamDto, Exam>().ReverseMap();
+        CreateMap<Exam, StudentExam>().ReverseMap();
+        CreateMap<Exam, CreateExamDto>().ReverseMap();
     }
 }

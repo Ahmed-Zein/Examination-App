@@ -1,27 +1,23 @@
 namespace Application.DTOs;
 
-public class QuestionDto
+public abstract class QuestionBaseDto
+{
+    public string Text { get; set; } = string.Empty;
+}
+
+public class QuestionDto : QuestionBaseDto
 {
     public int Id { get; set; }
-    public string Text { get; set; } = string.Empty;
     public List<AnswerDto> Answers { get; set; } = [];
 }
 
-public class AnswerDto
+public class StudentQuestion : QuestionBaseDto
 {
     public int Id { get; set; }
-    public string Text { get; set; } = string.Empty;
-    public bool IsCorrect { get; set; }
+    public List<StudentAnswer> Answers { get; set; } = [];
 }
 
-public class CreateQuestionDto
+public class CreateQuestionDto : QuestionBaseDto
 {
-    public string Text { get; set; } = string.Empty;
     public List<CreateAnswerDto> Answers { get; set; } = [];
-}
-
-public class CreateAnswerDto
-{
-    public string Text { get; set; } = string.Empty;
-    public bool IsCorrect { get; set; }
 }

@@ -24,7 +24,7 @@ public class SubjectRepository(AppDbContext context) : ISubjectRepository
         return subject switch
         {
             null => Result.Fail<Subject>("Subject not found"),
-            _ => Result.Ok(subject),
+            _ => Result.Ok(subject)
         };
     }
 

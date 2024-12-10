@@ -16,7 +16,6 @@ public class ExamController(IExamService examService) : ControllerBase
     public async Task<ActionResult<JsonResponse<List<ExamDto>>>> GetAllExams(int subjectId)
     {
         var serviceResult = await examService.GetExams(subjectId);
-
         return serviceResult switch
         {
             { IsSuccess: true } => Ok(JsonResponse<List<ExamDto>>.Ok(serviceResult.Value)),
@@ -59,6 +58,17 @@ public class ExamController(IExamService examService) : ControllerBase
         {
             { IsSuccess: true } => Ok(JsonResponse<ExamDto>.Ok(serviceResult.Value)),
             { IsSuccess: false } => BadRequest(JsonResponse<ExamDto>.Error(serviceResult.Errors))
+        };
+    }
+
+    [HttpGet("start")]
+    public async Task<ActionResult<JsonResponse<StudentExam>>> StartStudentExam(int subjectId)
+    {
+        var serviceResult = await examService.GetRandomExam(subjectId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => Ok(JsonResponse<StudentExam>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
         };
     }
 }

@@ -26,7 +26,7 @@ public sealed class TokenService(IConfiguration config) : ITokenService
             Expires = DateTime.UtcNow.AddDays(7),
             Issuer = config["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT:ISSUER can't be NULL"),
             Audience = config["Jwt:Audience"] ?? throw new InvalidOperationException("JWT:AUDIENCE can't be NULL"),
-            SigningCredentials = signInCredential,
+            SigningCredentials = signInCredential
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();

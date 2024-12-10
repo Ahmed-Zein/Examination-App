@@ -4,5 +4,5 @@ public enum ExamResultStatus
 {
     UnSubmitted,
     InEvaluation,
-    Evaluated,
+    Evaluated
 }

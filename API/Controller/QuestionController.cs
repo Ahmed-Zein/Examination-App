@@ -26,7 +26,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
         return queryResult switch
         {
             { IsSuccess: true } => Ok(JsonResponse<QuestionDto>.Ok(queryResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<QuestionDto>.Ok(queryResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<QuestionDto>.Ok(queryResult.Value))
         };
     }
 
@@ -41,7 +41,7 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
             { IsSuccess: true } => CreatedAtAction(nameof(GetQuestions),
                 new { subjectId },
                 JsonResponse<List<QuestionDto>>.Ok(createResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<List<QuestionDto>>.Error(createResult.Errors)),
+            { IsSuccess: false } => NotFound(JsonResponse<List<QuestionDto>>.Error(createResult.Errors))
         };
     }
 }

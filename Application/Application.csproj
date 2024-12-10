@@ -7,19 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
+        <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AutoMapper" Version="13.0.1" />
-      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
-      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+        <PackageReference Include="AutoMapper" Version="13.0.1"/>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Authentication.JwtBearer">
-        <HintPath>..\..\..\..\.nuget\packages\microsoft.aspnetcore.authentication.jwtbearer\8.0.11\lib\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.AspNetCore.Authentication.JwtBearer">
+            <HintPath>..\..\..\..\.nuget\packages\microsoft.aspnetcore.authentication.jwtbearer\8.0.11\lib\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

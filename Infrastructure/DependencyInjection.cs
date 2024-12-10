@@ -22,10 +22,7 @@ public static class DependencyInjection
         {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ??
                                  throw new ArgumentNullException($"No connection string"));
-            if (environment.IsDevelopment())
-            {
-                options.EnableSensitiveDataLogging();
-            }
+            if (environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
 
         services.AddIdentity<AppUser, IdentityRole>(options =>

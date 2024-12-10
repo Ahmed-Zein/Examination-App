@@ -53,15 +53,17 @@ public class ExamService(
         return mapper.Map<List<ExamDto>>(examsResult.Value);
     }
 
-    public async Task<Result<ExamDto>> GetRandomExam(int subjectId)
+
+    public async Task<Result<StudentExam>> GetRandomExam(int subjectId)
     {
         var examIds = await _examRepository.GetAllExamIds(subjectId);
         if (examIds.Count == 0)
             return Result.Fail("No exams found");
         var randomIndex = new Random().Next(0, examIds.Count);
 
-        var examsResult = await _examRepository.GetByIdAsync(examIds[randomIndex]);
-        return Result.Ok(mapper.Map<ExamDto>(examsResult.Value));
+        var exam = (await _examRepository.GetByIdAsync(examIds[randomIndex])).Value;
+
+        return Result.Ok(mapper.Map<StudentExam>(exam));
     }
 
     public async Task<Result> UpdateExamQestions(AddQuestionToExamDto questionDto)

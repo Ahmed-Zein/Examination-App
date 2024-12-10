@@ -24,7 +24,7 @@ public class SubjectService(IUnitOfWork unitOfWork, IMapper mapper) : ISubjectSe
         return subjectResult switch
         {
             { IsSuccess: true } => Result.Ok(mapper.Map<SubjectDto>(subjectResult.Value)),
-            { IsSuccess: false } => Result.Fail<SubjectDto>(subjectResult.Errors),
+            { IsSuccess: false } => Result.Fail<SubjectDto>(subjectResult.Errors)
         };
     }
 
@@ -32,10 +32,7 @@ public class SubjectService(IUnitOfWork unitOfWork, IMapper mapper) : ISubjectSe
     {
         var subjects = mapper.Map<List<Subject>>(subjectDto);
 
-        foreach (var subject in subjects)
-        {
-            await _subjectRepository.AddAsync(subject);
-        }
+        foreach (var subject in subjects) await _subjectRepository.AddAsync(subject);
 
         await unitOfWork.CommitAsync();
 
