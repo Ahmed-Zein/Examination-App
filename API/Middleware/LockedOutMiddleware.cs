@@ -10,8 +10,7 @@ public class LockedOutMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context, IAuthService authService)
     {
-        var role = context.User.FindFirstValue(ClaimTypes.Role)!;
-        if (role == AuthRolesConstants.Admin || !context.User.HasClaim(x => x.Type == ClaimTypes.NameIdentifier))
+        if (CheckRoleClaim(context))
         {
             await next(context);
             return;
@@ -21,20 +20,25 @@ public class LockedOutMiddleware(RequestDelegate next)
         var serviceResult = await authService.IsUserLockedOut(userId!);
         if (!serviceResult.IsSuccess)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-            var js = JsonResponse<string>.Error(serviceResult.Errors);
-            await context.Response.WriteAsJsonAsync(js);
-            return;
-        }
-
-        if (serviceResult.Value)
-        {
             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-            await context.Response.WriteAsJsonAsync(JsonResponse<string>.Error(serviceResult.Errors));
+            var jsonResponse = JsonResponse<string>.Error(serviceResult.Errors);
+            await context.Response.WriteAsJsonAsync(jsonResponse);
             return;
         }
 
         await next(context);
+    }
+
+    /// <param name="context"></param>
+    /// <returns>true if an Admin role is found</returns>
+    /// <returns>true if the token is missing letting the controller handel this case</returns>
+    /// <returns>false if a Student role is found</returns>
+    private static bool CheckRoleClaim(HttpContext context)
+    {
+        var roleClaim = context.User.FindFirstValue(ClaimTypes.Role);
+        var isRoleEmpty = string.IsNullOrEmpty(roleClaim);
+        var isAdminRole = roleClaim == AuthRolesConstants.Admin;
+        return isRoleEmpty || isAdminRole;
     }
 }
 

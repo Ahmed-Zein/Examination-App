@@ -17,7 +17,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         return authResult switch
         {
             { IsSuccess: true } => Ok(JsonResponse<AuthenticationResponseDto>.Ok(authResult.Value)),
-            { IsSuccess: false } => Unauthorized(JsonResponse<AuthenticationResponseDto>.Error(authResult.Errors))
+            { IsSuccess: false } => BadRequest(JsonResponse<AuthenticationResponseDto>.Error(authResult.Errors))
         };
     }
 

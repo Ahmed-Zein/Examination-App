@@ -70,7 +70,7 @@ public sealed class AuthService(
     {
         var user = await userManager.FindByIdAsync(userId);
         return user is not null
-            ? user.isLocked ? Result.Ok(user.isLocked).WithError("User locked out") : Result.Ok(user.isLocked)
+            ? user.isLocked ? Result.Fail(["User is Locked out"]) : Result.Ok(false)
             : Result.Fail("User does not exist");
     }
 

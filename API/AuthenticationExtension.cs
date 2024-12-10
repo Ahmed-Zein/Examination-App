@@ -1,4 +1,5 @@
 using System.Text;
+using API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -37,7 +38,7 @@ public static class AuthenticationExtension
                     context.Response.StatusCode = StatusCodes.Status403Forbidden;
                     context.Response.ContentType = "application/json";
                     return context.Response.WriteAsJsonAsync(
-                        new { Message = "Access forbidden: you do not have the required role." });
+                        JsonResponse<string>.Error(["Access forbidden: you do not have the required role."]));
                 },
                 OnChallenge = context =>
                 {
@@ -45,7 +46,8 @@ public static class AuthenticationExtension
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     context.Response.ContentType = "application/json";
 
-                    return context.Response.WriteAsJsonAsync(new { Message = "Unauthorized" });
+                    return context.Response.WriteAsJsonAsync(
+                        JsonResponse<string>.Error(["Unauthorized: invalid access token."]));
                 }
             };
         });

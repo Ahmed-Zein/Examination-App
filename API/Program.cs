@@ -1,4 +1,5 @@
 using API;
+using API.Middleware;
 using Application;
 using Infrastructure;
 
@@ -28,6 +29,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseLockedOutMiddleware();
 app.MapControllers();
 
 app.Run();

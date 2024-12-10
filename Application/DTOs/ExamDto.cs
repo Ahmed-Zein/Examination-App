@@ -1,3 +1,5 @@
+using Core.Entities;
+
 namespace Application.DTOs;
 
 public abstract class ExamDtoBase
@@ -9,6 +11,7 @@ public abstract class ExamDtoBase
 public class ExamDto : ExamDtoBase
 {
     public int Id { get; set; }
+    public List<QuestionDto> Questions { get; set; } = [];
 }
 
 public class CreateExamDto : ExamDtoBase
