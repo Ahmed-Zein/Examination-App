@@ -8,15 +8,18 @@ using FluentResults;
 
 namespace Application.Services;
 
-public class ExamService(IUnitOfWork unitOfWork, AddQuestionToExamValidator questionToExamValidator, IMapper mapper)
+public class ExamService(
+    IUnitOfWork unitOfWork,
+    AddQuestionToExamValidator questionToExamValidator,
+    CreateExamDtoValidator createExamDtoValidator,
+    IMapper mapper)
     : IExamService
 {
     private readonly IExamRepository _examRepository = unitOfWork.ExamRepository;
 
     public async Task<Result<ExamDto>> CreateExam(CreateExamDto createExamDto, int subjectId)
     {
-        var validator = new CreateExamDtoValidator();
-        var validationResult = await validator.ValidateAsync(createExamDto);
+        var validationResult = await createExamDtoValidator.ValidateAsync(createExamDto);
         if (!validationResult.IsValid)
             return Result.Fail(validationResult.Errors.Select(item => item.ErrorMessage));
 

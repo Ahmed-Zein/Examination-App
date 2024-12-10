@@ -31,7 +31,7 @@ public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestion
             question.SubjectId = subjectId;
             await _questionRepository.AddAsync(question);
         }
-
+        
         await unitOfWork.CommitAsync();
 
         return Result.Ok(mapper.Map<List<QuestionDto>>(questions));

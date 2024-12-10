@@ -18,6 +18,6 @@ public class CreateExamDtoValidator : AbstractValidator<CreateExamDto>
 
         RuleFor(x => x.Duration)
             .GreaterThan(TimeSpan.Zero).WithMessage("Duration must be greater than zero.")
-            .LessThanOrEqualTo(TimeSpan.FromHours(2)).WithMessage("Duration must be less than or equal to 5 hours.");
+            .LessThanOrEqualTo(TimeSpan.FromHours(5)).WithMessage("Duration must be less than or equal to 5 hours.");
     }
 }

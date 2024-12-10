@@ -7,4 +7,5 @@ public interface IStudentServices
 {
     Task<List<StudentDto>> GetAllAsync();
     Task<Result<StudentDto>> GetByIdAsync(string id);
+    Task<Result<StudentDto>> ToggleStudentLock(string studentId);
 }

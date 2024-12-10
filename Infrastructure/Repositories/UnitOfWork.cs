@@ -18,7 +18,7 @@ public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager) 
     public IAnswerRepository AnswerRepository => _answerRepository ??= new AnswerRepository(context);
     public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
     public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
-    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(userManager);
+    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(context, userManager);
 
     public async Task CommitAsync()
     {

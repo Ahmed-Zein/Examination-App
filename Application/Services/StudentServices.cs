@@ -25,4 +25,14 @@ public class StudentServices(IUnitOfWork unitOfWork, IMapper mapper) : IStudentS
             false => Result.Fail<StudentDto>("Student not found")
         };
     }
+
+    public async Task<Result<StudentDto>> ToggleStudentLock(string studentId)
+    {
+        var studentResult = await _studentRepository.UpdateUserLock(studentId);
+        if (!studentResult.IsSuccess)
+            return studentResult.ToResult();
+
+        await unitOfWork.CommitAsync();
+        return Result.Ok(mapper.Map<StudentDto>(studentResult.Value!));
+    }
 }

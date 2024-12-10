@@ -34,6 +34,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<Exam>()
             .Ignore(e => e.Questions);
 
+        modelBuilder.Entity<Exam>()
+            .Property(e => e.Duration)
+            .IsRequired();
         var roles = new List<IdentityRole>
         {
             new()

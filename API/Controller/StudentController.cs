@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controller;
 
+[Authorize]
 [ApiController]
 [Route("api/students")]
-[Authorize(Roles = AuthRolesConstants.Admin)]
 public class StudentController(IStudentServices studentServices) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = AuthRolesConstants.Admin)]
     public async Task<ActionResult<JsonResponse<List<StudentDto>>>> GetAllStudents()
     {
         var students = await studentServices.GetAllAsync();
@@ -22,12 +23,23 @@ public class StudentController(IStudentServices studentServices) : ControllerBas
     [HttpGet("{studentId}")]
     public async Task<ActionResult<JsonResponse<StudentDto>>> GetByStudentId(string studentId)
     {
-        var studentResult = await studentServices.GetByIdAsync(studentId);
+        var serviceResult = await studentServices.GetByIdAsync(studentId);
 
-        return studentResult.IsSuccess switch
+        return serviceResult.IsSuccess switch
         {
-            true => Ok(JsonResponse<StudentDto>.Ok(studentResult.Value)),
-            false => BadRequest(JsonResponse<StudentDto>.Error(studentResult.Errors))
+            true => Ok(JsonResponse<StudentDto>.Ok(serviceResult.Value)),
+            false => NotFound(JsonResponse<StudentDto>.Error(serviceResult.Errors))
+        };
+    }
+
+    [HttpPut("lock/{studentId}")]
+    public async Task<ActionResult<JsonResponse<StudentDto>>> ToggleStudentLock(string studentId)
+    {
+        var serviceResult = await studentServices.ToggleStudentLock(studentId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => Ok(JsonResponse<StudentDto>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<StudentDto>.Error(serviceResult.Errors))
         };
     }
 }

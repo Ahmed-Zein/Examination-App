@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241207184934_clean5")]
-    partial class clean5
+    [Migration("20241208193943_addDurationLimits")]
+    partial class addDurationLimits
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -210,9 +210,6 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ExamId")
-                        .HasColumnType("int");
-
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
@@ -221,8 +218,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ExamId");
 
                     b.HasIndex("SubjectId");
 
@@ -468,10 +463,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Question", b =>
                 {
-                    b.HasOne("Core.Entities.Exam", null)
-                        .WithMany("Questions")
-                        .HasForeignKey("ExamId");
-
                     b.HasOne("Core.Entities.Subject", "Subject")
                         .WithMany("Questions")
                         .HasForeignKey("SubjectId")
@@ -542,8 +533,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("ExamQuestions");
 
                     b.Navigation("ExamResults");
-
-                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("Core.Entities.Question", b =>

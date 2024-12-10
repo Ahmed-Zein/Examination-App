@@ -47,9 +47,12 @@ public sealed class AuthService(
         if (!signInResult.Succeeded)
             return _handelInvalidLogin(signInResult);
 
-        var user = await signInManager.UserManager.FindByEmailAsync(loginRequestDto.Email);
-        var roles = await userManager.GetRolesAsync(user!);
-        var token = tokenService.GenerateToken(user!, roles);
+        var user = (await signInManager.UserManager.FindByEmailAsync(loginRequestDto.Email))!;
+        if (user.isLocked)
+            return Result.Fail("Your account is locked");
+
+        var roles = await userManager.GetRolesAsync(user);
+        var token = tokenService.GenerateToken(user, roles);
         return Result.Ok(AuthenticationResponseDto.Success(token, "Login successful"));
     }
 
@@ -63,8 +66,15 @@ public sealed class AuthService(
         return Result.Ok(user);
     }
 
+    public async Task<Result<bool>> IsUserLockedOut(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        return user is not null
+            ? user.isLocked ? Result.Ok(user.isLocked).WithError("User locked out") : Result.Ok(user.isLocked)
+            : Result.Fail("User does not exist");
+    }
 
-    private Result<AuthenticationResponseDto> _handelInvalidLogin(SignInResult signInResult)
+    private static Result<AuthenticationResponseDto> _handelInvalidLogin(SignInResult signInResult)
     {
         return signInResult switch
         {
