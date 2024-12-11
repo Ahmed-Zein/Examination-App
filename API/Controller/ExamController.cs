@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
@@ -41,7 +42,7 @@ public class ExamController(IExamService examService) : ControllerBase
         int subjectId, int examId)
     {
         var dto = new AddQuestionToExamDto { QuestionIds = questionIds, SubjectId = subjectId, ExamId = examId };
-        var serviceResult = await examService.UpdateExamQestions(dto);
+        var serviceResult = await examService.UpdateExamQuestions(dto);
         return serviceResult switch
         {
             { IsSuccess: true } => CreatedAtAction(nameof(GetExamById), new { dto.ExamId, subjectId },
@@ -64,10 +65,30 @@ public class ExamController(IExamService examService) : ControllerBase
     [HttpGet("start")]
     public async Task<ActionResult<JsonResponse<StudentExam>>> StartStudentExam(int subjectId)
     {
-        var serviceResult = await examService.GetRandomExam(subjectId);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null)
+            return Unauthorized(JsonResponse<StudentExam>.Error(["Invalid user Token"]));
+
+        var serviceResult = await examService.GetRandomExam(userId, subjectId);
         return serviceResult switch
         {
             { IsSuccess: true } => Ok(JsonResponse<StudentExam>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
+        };
+    }
+
+    [HttpPost("{examId:int:min(1)}/evaluation")]
+    public async Task<ActionResult<JsonResponse<StudentExam>>> EvaluateStudentExam(int examId, int subjectId,
+        [FromBody] ExamSolutionsDto examSolutionsDto)
+    {
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null)
+            return Unauthorized(JsonResponse<StudentExam>.Error(["Invalid user Token"]));
+
+        var serviceResult = await examService.EvaluateExam(userId ,examId, examSolutionsDto);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => Ok(),
             { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
         };
     }

@@ -1,6 +1,5 @@
 using Application.Interfaces.Persistence;
 using Core.Entities;
-using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,11 +12,13 @@ public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager) 
     private ISubjectRepository? _subjectRepository;
     private IStudentRepository? _studentRepository;
     private IQuestionRepository? _questionRepository;
+    private IExamResultRepository? _examResultRepository;
 
     public IExamRepository ExamRepository => _examRepository ??= new ExamRepository(context);
     public IAnswerRepository AnswerRepository => _answerRepository ??= new AnswerRepository(context);
     public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
     public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
+    public IExamResultRepository ExamResultRepository => _examResultRepository ??= new ExamResultRepository(context);
     public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(context, userManager);
 
     public async Task CommitAsync()

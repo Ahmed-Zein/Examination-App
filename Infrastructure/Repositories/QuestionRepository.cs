@@ -67,4 +67,15 @@ public class QuestionRepository(AppDbContext context) : IQuestionRepository
         var query = context.Questions.Include(q => q.Answers).Where(q => q.SubjectId == subjectId);
         return query.ToListAsync();
     }
+
+    public Task<List<Question>> GetByExamId(int examId)
+    {
+        var query = context.ExamQuestions.Where(q => q.ExamId == examId)
+            .Include(q => q.Question)
+            .ThenInclude(q => q.Answers)
+            .Select(q => q.Question)
+            .AsNoTracking()
+            .AsQueryable();
+        return query.ToListAsync();
+    }
 }

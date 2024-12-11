@@ -4,6 +4,7 @@ using Application.Interfaces.Persistence;
 using Application.Validators;
 using AutoMapper;
 using Core.Entities;
+using Core.Enums;
 using FluentResults;
 
 namespace Application.Services;
@@ -54,7 +55,7 @@ public class ExamService(
     }
 
 
-    public async Task<Result<StudentExam>> GetRandomExam(int subjectId)
+    public async Task<Result<StudentExam>> GetRandomExam(string userId, int subjectId)
     {
         var examIds = await _examRepository.GetAllExamIds(subjectId);
         if (examIds.Count == 0)
@@ -62,11 +63,23 @@ public class ExamService(
         var randomIndex = new Random().Next(0, examIds.Count);
 
         var exam = (await _examRepository.GetByIdAsync(examIds[randomIndex])).Value;
+        var examResult = new ExamResult()
+        {
+            ExamId = exam.Id,
+            AppUserId = userId,
+            StartTime = DateTime.UtcNow,
+            TotalScore = exam.Questions.Count,
+            Status = ExamResultStatus.UnSubmitted,
+        };
+        await unitOfWork.ExamResultRepository.AddAsync(examResult);
+        await unitOfWork.CommitAsync();
+        var studentExamDto = mapper.Map<StudentExam>(exam);
+        studentExamDto.ExamResultId = examResult.Id;
 
-        return Result.Ok(mapper.Map<StudentExam>(exam));
+        return Result.Ok(studentExamDto);
     }
 
-    public async Task<Result> UpdateExamQestions(AddQuestionToExamDto questionDto)
+    public async Task<Result> UpdateExamQuestions(AddQuestionToExamDto questionDto)
     {
         var validationResult = await questionToExamValidator.ValidateAsync(questionDto);
         if (!validationResult.IsValid)
@@ -78,6 +91,42 @@ public class ExamService(
         await _examRepository.UpdateExamQuestions(questionDto.ExamId, questionDto.QuestionIds);
         await unitOfWork.CommitAsync();
 
+        return Result.Ok();
+    }
+
+    public async Task<Result> EvaluateExam(string userId, int examId, ExamSolutionsDto examSolutionsDto)
+    {
+        // TODO: Check that the question belongs to the actual Exam
+        var repositoryResult = await unitOfWork.ExamResultRepository.GetByIdAsync(examSolutionsDto.ExamResultId);
+
+        if (!repositoryResult.IsSuccess)
+            return Result.Fail(repositoryResult.Errors);
+
+        var examResult = repositoryResult.Value;
+        var examQuestions = await unitOfWork.QuestionRepository.GetByExamId(examId);
+        var studentScore = 0;
+        foreach (var solution in examSolutionsDto.Solutions)
+        {
+            var question = examQuestions.Find(q => q.Id == solution.QuestionId);
+            if (question is null)
+                return Result.Fail("The question does not exists");
+
+            var answer = question.Answers.Find(an => an.Id == solution.AnswerId);
+            if (answer is null)
+                return Result.Fail("The question does not have answer answer");
+            if (answer.IsCorrect)
+                studentScore += 1;
+        }
+
+        var endTime = DateTime.UtcNow;
+        if (examResult.StartTime + examResult.Exam.Duration >= endTime)
+        {
+            examResult.StudentScore = studentScore;
+        }
+
+        examResult.Status = ExamResultStatus.Evaluated;
+        examResult.EndTime = endTime;
+        await unitOfWork.CommitAsync();
         return Result.Ok();
     }
 }

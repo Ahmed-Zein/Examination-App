@@ -8,4 +8,5 @@ public interface IUnitOfWork : IDisposable
     IQuestionRepository QuestionRepository { get; }
     IAnswerRepository AnswerRepository { get; }
     IExamRepository ExamRepository { get; }
+    IExamResultRepository ExamResultRepository { get; }
 }
