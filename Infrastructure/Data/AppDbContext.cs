@@ -18,25 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-        modelBuilder.Entity<ExamQuestion>().HasKey(e => new { ExamId = e.ExamId, QuestionId = e.QuestionId });
-        modelBuilder.Entity<Question>()
-            .HasMany(q => q.ExamQuestions)
-            .WithOne(q => q.Question)
-            .OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-        modelBuilder.Entity<Exam>()
-            .HasMany(q => q.ExamQuestions)
-            .WithOne(q => q.Exam)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        // Added to disambiguate the existence of two relations [Many2Many, One2Many] 
-        modelBuilder.Entity<Exam>()
-            .Ignore(e => e.Questions);
-
-        modelBuilder.Entity<Exam>()
-            .Property(e => e.Duration)
-            .IsRequired();
         var roles = new List<IdentityRole>
         {
             new()
