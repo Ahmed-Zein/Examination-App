@@ -1,5 +1,6 @@
 using Application.DTOs;
 using AutoMapper;
+using AutoMapper.Internal;
 using Core.Entities;
 
 namespace Application.Mappers;
@@ -50,6 +51,10 @@ public class AppMappersProfiles : Profile
 
     private void _examResultMapper()
     {
-        CreateMap<ExamResult, ExamResultDto>().ReverseMap();
+        CreateMap<ExamResultDto, ExamResult>().ReverseMap()
+            .ForMember(e => e.StudentEmail,
+                opt => opt.MapFrom(src => src.AppUser.Email))
+            .ForMember(e => e.StudentId,
+                opt => opt.MapFrom(src => src.AppUser.Id));
     }
 }

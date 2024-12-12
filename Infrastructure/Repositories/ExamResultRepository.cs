@@ -15,7 +15,9 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
 
     public async Task<List<ExamResult>> GetAllAsync()
     {
-        return await context.ExamResults.ToListAsync();
+        return await context.ExamResults
+            .Include(e => e.AppUser)
+            .ToListAsync();
     }
 
     public async Task<Result<ExamResult>> GetByIdAsync(int id)

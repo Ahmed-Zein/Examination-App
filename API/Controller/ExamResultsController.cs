@@ -22,7 +22,7 @@ public class ExamResultsController(IExamResultService examResultService) : Contr
     }
 
     [HttpGet("{studentId}")]
-    public async Task<ActionResult<JsonResponse<List<ExamResult>>>> GetAllByStudentId(string studentId)
+    public async Task<ActionResult<JsonResponse<List<ExamResultDto>>>> GetAllByStudentId(string studentId)
     {
         var serviceResults = await examResultService.GetAllByStudentId(studentId);
 
