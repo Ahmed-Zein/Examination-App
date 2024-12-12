@@ -16,6 +16,11 @@ public class StudentRepository(AppDbContext context, UserManager<AppUser> userMa
         return students;
     }
 
+    public async Task<bool> Exists(string userId)
+    {
+        return await userManager.Users.AnyAsync(x => x.Id == userId);
+    }
+
     public async Task<Result<AppUser>> GetByIdAsync(string id)
     {
         var user = await userManager.FindByIdAsync(id);

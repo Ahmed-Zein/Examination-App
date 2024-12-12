@@ -49,11 +49,14 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
         examResult.EndTime = toUpdate.EndTime;
 
         var examDuration = await examDurationTask;
-        if (examResult.StartTime + examDuration < toUpdate.EndTime)
-        {
-            examResult.StudentScore = toUpdate.StudentScore;
-        }
+        if (examResult.StartTime + examDuration < toUpdate.EndTime) examResult.StudentScore = toUpdate.StudentScore;
 
         return Result.Ok(examResult);
+    }
+
+    public async Task<Result<List<ExamResult>>> GetByStudentId(string studentId)
+    {
+        var exam = await context.ExamResults.Where(e => e.AppUserId == studentId).ToListAsync();
+        return Result.Ok(exam);
     }
 }

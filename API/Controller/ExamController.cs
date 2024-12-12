@@ -85,7 +85,7 @@ public class ExamController(IExamService examService) : ControllerBase
         if (userId is null)
             return Unauthorized(JsonResponse<StudentExam>.Error(["Invalid user Token"]));
 
-        var serviceResult = await examService.EvaluateExam(userId ,examId, examSolutionsDto);
+        var serviceResult = await examService.EvaluateExam(userId, examId, examSolutionsDto);
         return serviceResult switch
         {
             { IsSuccess: true } => Ok(),

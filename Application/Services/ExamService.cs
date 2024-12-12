@@ -69,7 +69,7 @@ public class ExamService(
             AppUserId = userId,
             StartTime = DateTime.UtcNow,
             TotalScore = exam.Questions.Count,
-            Status = ExamResultStatus.UnSubmitted,
+            Status = ExamResultStatus.UnSubmitted
         };
         await unitOfWork.ExamResultRepository.AddAsync(examResult);
         await unitOfWork.CommitAsync();
@@ -119,10 +119,7 @@ public class ExamService(
         }
 
         var endTime = DateTime.UtcNow;
-        if (examResult.StartTime + examResult.Exam.Duration >= endTime)
-        {
-            examResult.StudentScore = studentScore;
-        }
+        if (examResult.StartTime + examResult.Exam.Duration >= endTime) examResult.StudentScore = studentScore;
 
         examResult.Status = ExamResultStatus.Evaluated;
         examResult.EndTime = endTime;
