@@ -119,10 +119,24 @@ public class ExamService(
         }
 
         var endTime = DateTime.UtcNow;
-        if (examResult.StartTime + examResult.Exam.Duration >= endTime) examResult.StudentScore = studentScore;
+
+        if (examResult.Exam is not null
+            && examResult.StartTime + examResult.Exam.Duration >= endTime)
+            examResult.StudentScore = studentScore;
 
         examResult.Status = ExamResultStatus.Evaluated;
         examResult.EndTime = endTime;
+        await unitOfWork.CommitAsync();
+        return Result.Ok();
+    }
+
+    public async Task<Result> DeleteExam(int examId)
+    {
+        var repositoryResult = await _examRepository.GetByIdAsync(examId);
+        if (!repositoryResult.IsSuccess)
+            return repositoryResult.ToResult();
+
+        _examRepository.Delete(repositoryResult.Value);
         await unitOfWork.CommitAsync();
         return Result.Ok();
     }

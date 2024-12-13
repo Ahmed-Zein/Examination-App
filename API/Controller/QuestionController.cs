@@ -41,7 +41,18 @@ public class QuestionController(IQuestionService questionService) : ControllerBa
             { IsSuccess: true } => CreatedAtAction(nameof(GetQuestions),
                 new { subjectId },
                 JsonResponse<List<QuestionDto>>.Ok(createResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<List<QuestionDto>>.Error(createResult.Errors))
+            { IsSuccess: false } => BadRequest(JsonResponse<List<QuestionDto>>.Error(createResult.Errors))
+        };
+    }
+
+    [HttpDelete("{questionId:int:min(1)}")]
+    public async Task<ActionResult> DeleteQuestion(int subjectId, int questionId)
+    {
+        var serviceResult = await questionService.DeleteQuestion(questionId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => NoContent(),
+            { IsSuccess: false } => BadRequest(JsonResponse<string>.Error(serviceResult.Errors))
         };
     }
 }

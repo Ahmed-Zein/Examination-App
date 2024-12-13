@@ -20,7 +20,12 @@ public class SubjectRepository(AppDbContext context) : ISubjectRepository
 
     public async Task<Result<Subject>> GetByIdAsync(int id)
     {
-        var subject = await context.Subjects.FindAsync(id);
+        var subject = await context.Subjects
+            .Include(e => e.Questions)
+            .ThenInclude(e => e.Answers)
+            .Include(e => e.Exams)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
         return subject switch
         {
             null => Result.Fail<Subject>("Subject not found"),

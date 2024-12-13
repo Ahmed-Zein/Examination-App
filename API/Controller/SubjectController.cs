@@ -24,11 +24,11 @@ public class SubjectController(ISubjectService subjectService) : ControllerBase
     [HttpGet("{subjectId:int:min(1)}")]
     public async Task<ActionResult<JsonResponse<SubjectDto>>> GetById(int subjectId)
     {
-        var subjectResult = await subjectService.GetById(subjectId);
-        return subjectResult switch
+        var serviceResult = await subjectService.GetById(subjectId);
+        return serviceResult switch
         {
-            { IsSuccess: true } => Ok(JsonResponse<SubjectDto>.Ok(subjectResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(subjectResult.Errors))
+            { IsSuccess: true } => Ok(JsonResponse<SubjectDto>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(serviceResult.Errors))
         };
     }
 
@@ -46,11 +46,23 @@ public class SubjectController(ISubjectService subjectService) : ControllerBase
     public async Task<ActionResult<JsonResponse<SubjectDto>>> AddSubject([FromBody] UpdateSubjectDto updateSubjectDto,
         int subjectId)
     {
-        var updateSubjectResult = await subjectService.UpdateSubject(updateSubjectDto, subjectId);
-        return updateSubjectResult switch
+        var serviceResult = await subjectService.UpdateSubject(updateSubjectDto, subjectId);
+        return serviceResult switch
         {
-            { IsSuccess: true } => Ok(JsonResponse<SubjectDto>.Ok(updateSubjectResult.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(updateSubjectResult.Errors))
+            { IsSuccess: true } => Ok(JsonResponse<SubjectDto>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(serviceResult.Errors))
+        };
+    }
+
+    [HttpDelete("{subjectId:int:min(1)}")]
+    [Authorize(Roles = AuthRolesConstants.Admin)]
+    public async Task<ActionResult> DeleteSubject(int subjectId)
+    {
+        var serviceResult = await subjectService.DeleteSubject(subjectId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => NoContent(),
+            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(serviceResult.Errors))
         };
     }
 }

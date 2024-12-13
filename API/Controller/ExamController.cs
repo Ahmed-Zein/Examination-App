@@ -92,4 +92,15 @@ public class ExamController(IExamService examService) : ControllerBase
             { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
         };
     }
+
+    [HttpDelete("{examId:int:min(1)}")]
+    public async Task<ActionResult<JsonResponse<StudentExam>>> DeleteExam(int examId, int subjectId)
+    {
+        var serviceResult = await examService.DeleteExam(examId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => NoContent(),
+            { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
+        };
+    }
 }

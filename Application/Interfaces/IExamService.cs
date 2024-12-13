@@ -11,4 +11,5 @@ public interface IExamService
     Task<Result<StudentExam>> GetRandomExam(string userId, int subjectId);
     Task<Result> UpdateExamQuestions(AddQuestionToExamDto questionDto);
     Task<Result> EvaluateExam(string userId, int examId, ExamSolutionsDto examSolutionsDto);
+    Task<Result> DeleteExam(int examId);
 }

@@ -9,4 +9,5 @@ public interface ISubjectService
     Task<Result<SubjectDto>> GetById(int id);
     Task<List<SubjectDto>> CreateSubject(List<CreateSubjectDto> subjectDto);
     Task<Result<SubjectDto>> UpdateSubject(UpdateSubjectDto subjectDto, int id);
+    Task<Result> DeleteSubject(int subjectI);
 }

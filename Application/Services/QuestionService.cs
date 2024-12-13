@@ -13,10 +13,20 @@ public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestion
 {
     private readonly IQuestionRepository _questionRepository = unitOfWork.QuestionRepository;
 
-    public async Task<Result<List<QuestionDto>>> AddQuestion(List<CreateQuestionDto> quetionsDto, int subjectId)
+    public async Task<Result> DeleteQuestion(int questionId)
+    {
+        var repositoryResult = await _questionRepository.GetByIdAsync(questionId);
+        if (!repositoryResult.IsSuccess)
+            return repositoryResult.ToResult();
+        _questionRepository.Delete(repositoryResult.Value);
+        await unitOfWork.CommitAsync();
+        return Result.Ok();
+    }
+
+    public async Task<Result<List<QuestionDto>>> AddQuestion(List<CreateQuestionDto> questionDtOs, int subjectId)
     {
         var validator = new CreateQuestionListDtoValidator();
-        var result = await validator.ValidateAsync(quetionsDto);
+        var result = await validator.ValidateAsync(questionDtOs);
 
         if (!result.IsValid)
             return Result.Fail(result.Errors.Select(e => e.ErrorMessage));
@@ -25,7 +35,7 @@ public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestion
         if (!subjectExists)
             return Result.Fail("Subject not found");
 
-        var questions = mapper.Map<List<Question>>(quetionsDto);
+        var questions = mapper.Map<List<Question>>(questionDtOs);
         foreach (var question in questions)
         {
             question.SubjectId = subjectId;

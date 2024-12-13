@@ -8,6 +8,7 @@ public abstract class SubjectDtoBase
 public class SubjectDto : SubjectDtoBase
 {
     public int Id { get; set; }
+    public List<ExamDto> Exams { get; set; } = [];
     public List<QuestionDto> Questions { get; set; } = [];
 }
 

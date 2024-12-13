@@ -52,4 +52,16 @@ public class SubjectService(IUnitOfWork unitOfWork, IMapper mapper) : ISubjectSe
 
         return mapper.Map<SubjectDto>(subject);
     }
+
+    public async Task<Result> DeleteSubject(int subjectId)
+    {
+        var repositoryResult = await _subjectRepository.GetByIdAsync(subjectId);
+        if (!repositoryResult.IsSuccess)
+            return repositoryResult.ToResult();
+
+        _subjectRepository.Delete(repositoryResult.Value);
+        await unitOfWork.CommitAsync();
+
+        return Result.Ok();
+    }
 }
