@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.Models;
 using AutoMapper;
 using AutoMapper.Internal;
 using Core.Entities;
@@ -20,6 +21,7 @@ public class AppMappersProfiles : Profile
     private void _studentMapper()
     {
         CreateMap<AppUser, StudentDto>().ReverseMap();
+        CreateMap<PagedData<AppUser>, PagedData<StudentDto>>().ReverseMap();
     }
 
     private void _subjectMapper()

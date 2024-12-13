@@ -1,3 +1,4 @@
+using Application.Models;
 using Core.Entities;
 using FluentResults;
 
@@ -5,7 +6,7 @@ namespace Application.Interfaces.Persistence;
 
 public interface IStudentRepository
 {
-    Task<List<AppUser>> GetAllAsync();
+    Task<PagedData<AppUser>> GetAllAsync(PaginationQuery query);
     Task<bool> Exists(string userId);
     Task<Result<AppUser>> GetByIdAsync(string id);
 

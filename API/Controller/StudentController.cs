@@ -1,6 +1,7 @@
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Models;
 using Core.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,11 @@ public class StudentController(IStudentServices studentServices) : ControllerBas
 {
     [HttpGet]
     [Authorize(Roles = AuthRolesConstants.Admin)]
-    public async Task<ActionResult<JsonResponse<List<StudentDto>>>> GetAllStudents()
+    public async Task<ActionResult<JsonResponse<PagedData<StudentDto>>>> GetAllStudents(
+        [FromQuery] PaginationQuery pagination)
     {
-        var students = await studentServices.GetAllAsync();
-        return Ok(JsonResponse<List<StudentDto>>.Ok(students));
+        var students = await studentServices.GetAllAsync(pagination);
+        return Ok(JsonResponse<PagedData<StudentDto>>.Ok(students));
     }
 
     [HttpGet("{studentId}")]

@@ -1,15 +1,16 @@
+using Core.Entities;
 using FluentResults;
 
 namespace Application.Interfaces.Persistence;
 
-public interface IRepository<T, in TP>
+public interface IRepository<T> where T : BaseModel
 {
-    Task<bool> AnyAsync(TP id);
+    Task<bool> AnyAsync(int id);
 
     Task<List<T>> GetAllAsync();
-    Task<Result<T>> GetByIdAsync(TP id);
+    Task<Result<T>> GetByIdAsync(int id);
 
     void Delete(T entity);
     Task AddAsync(T entity);
-    Task<Result<T>> UpdateAsync(TP id, T toUpdate);
+    Task<Result<T>> UpdateAsync(int id, T toUpdate);
 }

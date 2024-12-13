@@ -1,4 +1,5 @@
 using Application.Interfaces.Persistence;
+using Application.Models;
 using Core.Constants;
 using Core.Entities;
 using FluentResults;
@@ -8,12 +9,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class StudentRepository(AppDbContext context, UserManager<AppUser> userManager) : IStudentRepository
+public class StudentRepository(
+    AppDbContext context,
+    UserManager<AppUser> userManager,
+    RoleManager<IdentityRole> roleManager)
+    : IStudentRepository
 {
-    public async Task<List<AppUser>> GetAllAsync()
+    public async Task<PagedData<AppUser>> GetAllAsync(PaginationQuery query)
     {
-        var students = (List<AppUser>)await userManager.GetUsersInRoleAsync(AuthRolesConstants.Student);
-        return students;
+        var studentRole = await roleManager.Roles
+            .Where(role => role.Name!.Equals(AuthRolesConstants.Student))
+            .Select(role => role.Id).FirstOrDefaultAsync();
+
+        // Used instead of writing two queries to get all students userIds then fetch them on another query 
+        var studentsQuery = from user in context.Users
+            join userRole in context.UserRoles on user.Id equals userRole.UserId
+            where userRole.RoleId == studentRole
+            select user;
+
+        return await PagedData<AppUser>.CreateAsync(studentsQuery.AsNoTracking(), query);
     }
 
     public async Task<bool> Exists(string userId)

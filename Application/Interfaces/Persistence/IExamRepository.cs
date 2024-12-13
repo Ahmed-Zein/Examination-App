@@ -3,7 +3,7 @@ using FluentResults;
 
 namespace Application.Interfaces.Persistence;
 
-public interface IExamRepository : IRepository<Exam, int>
+public interface IExamRepository : IRepository<Exam>
 {
     Task<Result<List<Exam>>> GetAllBySubject(int subjectId);
     Task<List<int>> GetAllExamIds(int subjectId);

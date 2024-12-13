@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Repositories;
 
-public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager) : IUnitOfWork
+public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+    : IUnitOfWork
 {
     private IExamRepository? _examRepository;
     private IAnswerRepository? _answerRepository;
@@ -19,7 +20,9 @@ public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager) 
     public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
     public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
     public IExamResultRepository ExamResultRepository => _examResultRepository ??= new ExamResultRepository(context);
-    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(context, userManager);
+
+    public IStudentRepository StudentRepository =>
+        _studentRepository ??= new StudentRepository(context, userManager, roleManager);
 
     public async Task CommitAsync()
     {

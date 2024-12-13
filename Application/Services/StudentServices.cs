@@ -1,6 +1,7 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Application.Interfaces.Persistence;
+using Application.Models;
 using AutoMapper;
 using FluentResults;
 
@@ -10,10 +11,10 @@ public class StudentServices(IUnitOfWork unitOfWork, IMapper mapper) : IStudentS
 {
     private readonly IStudentRepository _studentRepository = unitOfWork.StudentRepository;
 
-    public async Task<List<StudentDto>> GetAllAsync()
+    public async Task<PagedData<StudentDto>> GetAllAsync(PaginationQuery query)
     {
-        var students = await _studentRepository.GetAllAsync();
-        return mapper.Map<List<StudentDto>>(students);
+        var students = await _studentRepository.GetAllAsync(query);
+        return mapper.Map<PagedData<StudentDto>>(students);
     }
 
     public async Task<Result<StudentDto>> GetByIdAsync(string id)
