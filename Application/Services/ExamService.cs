@@ -23,7 +23,7 @@ public class ExamService(
     {
         var validationResult = await createExamDtoValidator.ValidateAsync(createExamDto);
         if (!validationResult.IsValid)
-            return Result.Fail(validationResult.Errors.Select(item => item.ErrorMessage));
+            return Result.Fail(validationResult.Errors.Select(item => item.ErrorMessage).Append(ErrorType.BadRequest));
 
         var exam = mapper.Map<Exam>(createExamDto);
         exam.SubjectId = subjectId;
@@ -51,7 +51,7 @@ public class ExamService(
     {
         var examsResult = await _examRepository.GetAllBySubject(subjectId);
         if (!examsResult.IsSuccess)
-            return Result.Fail(examsResult.Errors);
+            return examsResult.ToResult();
         return mapper.Map<List<ExamDto>>(examsResult.Value);
     }
 
@@ -60,11 +60,12 @@ public class ExamService(
     {
         var examIds = await _examRepository.GetAllExamIds(subjectId);
         if (examIds.Count == 0)
-            return Result.Fail("No exams found");
+            return Result.Fail(["No exams found", ErrorType.NotFound]);
+
         var randomIndex = new Random().Next(0, examIds.Count);
 
         var exam = (await _examRepository.GetByIdAsync(examIds[randomIndex])).Value;
-        var examResult = new ExamResult()
+        var examResult = new ExamResult
         {
             ExamId = exam.Id,
             AppUserId = userId,
@@ -74,8 +75,8 @@ public class ExamService(
         };
         await unitOfWork.ExamResultRepository.AddAsync(examResult);
         await unitOfWork.CommitAsync();
+
         var studentExamDto = mapper.Map<StudentExam>(exam);
-        studentExamDto.ExamResultId = examResult.Id;
 
         return Result.Ok(studentExamDto);
     }
@@ -112,11 +113,11 @@ public class ExamService(
         {
             var question = examQuestions.Find(q => q.Id == solution.QuestionId);
             if (question is null)
-                return Result.Fail("The question does not exists");
+                return Result.Fail(["The question does not exists", ErrorType.BadRequest]);
 
             var answer = question.Answers.Find(an => an.Id == solution.AnswerId);
             if (answer is null)
-                return Result.Fail("The question does not have answer answer");
+                return Result.Fail(["The question does not have a valid answer", ErrorType.BadRequest]);
             if (answer.IsCorrect)
                 studentScore += 1;
         }

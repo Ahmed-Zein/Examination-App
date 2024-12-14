@@ -1,4 +1,5 @@
 using Application.Interfaces.Persistence;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 using Infrastructure.Data;
@@ -24,7 +25,7 @@ public class QuestionRepository(AppDbContext context) : IQuestionRepository
         var question = await query.FirstOrDefaultAsync(e => e.Id == id);
         return question switch
         {
-            null => Result.Fail<Question>("Question not found"),
+            null => Result.Fail<Question>(["Question not found", ErrorType.NotFound]),
             _ => Result.Ok(question)
         };
     }
@@ -41,14 +42,13 @@ public class QuestionRepository(AppDbContext context) : IQuestionRepository
 
     public async Task<Result<Question>> UpdateAsync(int id, Question toUpdate)
     {
-        var questionResult = await GetByIdAsync(id);
-        if (questionResult.IsFailed)
-            return questionResult;
+        var question = await context.Questions.FirstOrDefaultAsync(e => e.Id == id);
+        if (question is null)
+            return Result.Fail<Question>(["Question not found", ErrorType.NotFound]);
 
-        var question = questionResult.Value;
         question.Text = toUpdate.Text;
 
-        return questionResult;
+        return Result.Ok(question);
     }
 
     public async Task<List<int>> GetQuestionsIdBySubject(int subjectId)

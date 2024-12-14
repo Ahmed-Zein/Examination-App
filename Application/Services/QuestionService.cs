@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Persistence;
 using Application.Validators;
 using AutoMapper;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 using FluentValidation;
@@ -29,11 +30,11 @@ public class QuestionService(IUnitOfWork unitOfWork, IMapper mapper) : IQuestion
         var result = await validator.ValidateAsync(questionDtOs);
 
         if (!result.IsValid)
-            return Result.Fail(result.Errors.Select(e => e.ErrorMessage));
+            return Result.Fail(result.Errors.Select(e => e.ErrorMessage).Append(ErrorType.BadRequest));
 
         var subjectExists = await unitOfWork.SubjectRepository.AnyAsync(subjectId);
         if (!subjectExists)
-            return Result.Fail("Subject not found");
+            return Result.Fail(["Subject not found", ErrorType.NotFound]);
 
         var questions = mapper.Map<List<Question>>(questionDtOs);
         foreach (var question in questions)

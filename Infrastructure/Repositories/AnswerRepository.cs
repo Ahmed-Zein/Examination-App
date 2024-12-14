@@ -1,4 +1,5 @@
 using Application.Interfaces.Persistence;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 using Infrastructure.Data;
@@ -22,7 +23,7 @@ public class AnswerRepository(AppDbContext context) : IAnswerRepository
     {
         var answer = await context.Answers.FindAsync(id);
 
-        return answer == null ? Result.Fail<Answer>("Answer not found") : Result.Ok(answer);
+        return answer == null ? Result.Fail<Answer>(["Answer not found", ErrorType.NotFound]) : Result.Ok(answer);
     }
 
     public void Delete(Answer entity)

@@ -43,7 +43,7 @@ public class StudentRepository(
     {
         var user = await userManager.FindByIdAsync(id);
         if (user == null)
-            return Result.Fail<AppUser>("User not found");
+            return Result.Fail<AppUser>(["User not found", ErrorType.NotFound]);
 
         var userExamResults = await context.ExamResults.Where(e => e.AppUserId == user.Id).ToListAsync();
         user.ExamResults = userExamResults;

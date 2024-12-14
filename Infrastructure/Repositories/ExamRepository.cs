@@ -68,7 +68,7 @@ public class ExamRepository(AppDbContext context) : IExamRepository
     public async Task<Result<List<Exam>>> GetAllBySubject(int subjectId)
     {
         if (!await context.Subjects.AnyAsync(s => s.Id == subjectId))
-            return Result.Fail<List<Exam>>("Subject not found");
+            return Result.Fail<List<Exam>>(["Subject not found", ErrorType.NotFound]);
 
         var exams = await context.Exams.Where(s => s.SubjectId == subjectId)
             .ToListAsync();
@@ -77,11 +77,15 @@ public class ExamRepository(AppDbContext context) : IExamRepository
 
     public async Task<List<int>> GetAllExamIds(int subjectId)
     {
-        var exams = await context.Subjects.Where(s => s.Id == subjectId)
-            .Select(e => e.Exams.Select(s => s.Id).ToList())
-            .FirstOrDefaultAsync();
-        return exams ?? [];
+        var exams = await
+            context.Exams
+                .Where(exam => exam.SubjectId == subjectId)
+                .Join(context.ExamQuestions, exam => exam.Id, examQuestion => examQuestion.ExamId,
+                    (exam, examQuestion) => examQuestion.ExamId)
+                .ToListAsync();
+        return exams;
     }
+
 
     public async Task UpdateExamQuestions(int examId, List<int> newQuestions)
     {

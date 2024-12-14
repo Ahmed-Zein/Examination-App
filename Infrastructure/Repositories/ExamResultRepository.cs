@@ -63,7 +63,7 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
     {
         var examResult = await context.ExamResults.FirstOrDefaultAsync(e => e.Id == id);
         if (examResult is null)
-            return Result.Fail("exam result not found");
+            return Result.Fail(["exam result not found", ErrorType.NotFound]);
 
         var examDurationTask = context.Exams.Where(e => e.Id == examResult.ExamId)
             .Select(e => e.Duration)

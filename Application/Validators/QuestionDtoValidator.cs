@@ -13,7 +13,7 @@ public class CreateQuestionDtoValidator : AbstractValidator<CreateQuestionDto>
 
         RuleFor(x => x.Answers)
             .NotEmpty().WithMessage("At least one answer is required.")
-            .Must(answers => answers.Any(a => a.IsCorrect))
+            .Must(answers => answers.Count > 1 && answers.Any(a => a.IsCorrect))
             .WithMessage("At least one correct answer is required.");
 
         RuleForEach(x => x.Answers)
