@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Persistence;
 using Application.Validators;
 using AutoMapper;
+using Core.Constants;
 using Core.Entities;
 using Core.Enums;
 using FluentResults;
@@ -96,13 +97,15 @@ public class ExamService(
 
     public async Task<Result> EvaluateExam(string userId, int examId, ExamSolutionsDto examSolutionsDto)
     {
-        // TODO: Check that the question belongs to the actual Exam
         var repositoryResult = await unitOfWork.ExamResultRepository.GetByIdAsync(examSolutionsDto.ExamResultId);
 
         if (!repositoryResult.IsSuccess)
             return Result.Fail(repositoryResult.Errors);
 
         var examResult = repositoryResult.Value;
+        if (examResult.Status is ExamResultStatus.Evaluated)
+            return Result.Fail(["The exam is already evaluated", ErrorType.Conflict]);
+
         var examQuestions = await unitOfWork.QuestionRepository.GetByExamId(examId);
         var studentScore = 0;
         foreach (var solution in examSolutionsDto.Solutions)
@@ -136,8 +139,21 @@ public class ExamService(
         if (!repositoryResult.IsSuccess)
             return repositoryResult.ToResult();
 
+        if (await _examRepository.HasExamResults(examId))
+            return Result.Fail(["Cannot delete an exam that has  Results", ErrorType.BadRequest]);
+
         _examRepository.Delete(repositoryResult.Value);
         await unitOfWork.CommitAsync();
         return Result.Ok();
+    }
+
+    public async Task<Result<ExamDto>> UpdateExam(int examId, UpdateExamDto examDto)
+    {
+        var repositoryResult = await _examRepository.UpdateAsync(examId, mapper.Map<Exam>(examDto));
+        if (!repositoryResult.IsSuccess)
+            return repositoryResult.ToResult();
+
+        await unitOfWork.CommitAsync();
+        return Result.Ok(mapper.Map<ExamDto>(repositoryResult.Value));
     }
 }

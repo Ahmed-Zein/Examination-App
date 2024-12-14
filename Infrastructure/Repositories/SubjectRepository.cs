@@ -1,4 +1,5 @@
 using Application.Interfaces.Persistence;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 using Infrastructure.Data;
@@ -28,7 +29,7 @@ public class SubjectRepository(AppDbContext context) : ISubjectRepository
 
         return subject switch
         {
-            null => Result.Fail<Subject>("Subject not found"),
+            null => Result.Fail<Subject>(["Subject not found", ErrorType.NotFound]),
             _ => Result.Ok(subject)
         };
     }

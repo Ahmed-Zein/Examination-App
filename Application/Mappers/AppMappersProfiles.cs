@@ -56,6 +56,7 @@ public class AppMappersProfiles : Profile
     {
         CreateMap<Exam, ExamDto>().ReverseMap();
         CreateMap<Exam, StudentExam>().ReverseMap();
+        CreateMap<Exam, UpdateExamDto>().ReverseMap();
         CreateMap<Exam, CreateExamDto>().ReverseMap();
     }
 

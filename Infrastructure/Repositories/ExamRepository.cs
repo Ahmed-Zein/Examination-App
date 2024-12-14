@@ -1,4 +1,5 @@
 using Application.Interfaces.Persistence;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 using Infrastructure.Data;
@@ -13,6 +14,11 @@ public class ExamRepository(AppDbContext context) : IExamRepository
         return context.Answers.AnyAsync(e => e.Id == id);
     }
 
+    public async Task<bool> HasExamResults(int examId)
+    {
+        return await context.ExamResults.AnyAsync(e => e.ExamId == examId);
+    }
+
     public Task<List<Exam>> GetAllAsync()
     {
         return context.Exams.ToListAsync();
@@ -24,7 +30,7 @@ public class ExamRepository(AppDbContext context) : IExamRepository
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (exam == null)
-            return Result.Fail("Exam not found");
+            return Result.Fail(["Exam not found", ErrorType.NotFound]);
 
         var examQuestions = await context.ExamQuestions
             .Where(e => e.ExamId == id)

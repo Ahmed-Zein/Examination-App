@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using API.Helper;
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
@@ -37,6 +38,19 @@ public class ExamController(IExamService examService) : ControllerBase
     }
 
     [HttpPut("{examId:int:min(1)}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<JsonResponse<object>>> EditExam([FromBody] UpdateExamDto examDto, int subjectId,
+        int examId)
+    {
+        var serviceResult = await examService.UpdateExam(examId, examDto);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => Ok(serviceResult.Value),
+            { IsSuccess: false } => BadRequest(JsonResponse<object>.Error(serviceResult.Errors))
+        };
+    }
+
+    [HttpPut("{examId:int:min(1)}/questions")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<JsonResponse<object>>> UpdateExamQuestions([FromBody] List<int> questionIds,
         int subjectId, int examId)
@@ -86,21 +100,20 @@ public class ExamController(IExamService examService) : ControllerBase
             return Unauthorized(JsonResponse<StudentExam>.Error(["Invalid user Token"]));
 
         var serviceResult = await examService.EvaluateExam(userId, examId, examSolutionsDto);
-        return serviceResult switch
-        {
-            { IsSuccess: true } => Ok(),
-            { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
-        };
+
+        if (serviceResult.IsSuccess)
+            return NoContent();
+
+        return (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors);
     }
 
     [HttpDelete("{examId:int:min(1)}")]
     public async Task<ActionResult<JsonResponse<StudentExam>>> DeleteExam(int examId, int subjectId)
     {
         var serviceResult = await examService.DeleteExam(examId);
-        return serviceResult switch
-        {
-            { IsSuccess: true } => NoContent(),
-            { IsSuccess: false } => BadRequest(JsonResponse<StudentExam>.Error(serviceResult.Errors))
-        };
+        if (serviceResult.IsSuccess)
+            return NoContent();
+
+        return (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors);
     }
 }

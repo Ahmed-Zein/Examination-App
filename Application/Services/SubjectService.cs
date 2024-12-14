@@ -2,6 +2,7 @@ using Application.DTOs;
 using Application.Interfaces;
 using Application.Interfaces.Persistence;
 using AutoMapper;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 
@@ -59,7 +60,13 @@ public class SubjectService(IUnitOfWork unitOfWork, IMapper mapper) : ISubjectSe
         if (!repositoryResult.IsSuccess)
             return repositoryResult.ToResult();
 
-        _subjectRepository.Delete(repositoryResult.Value);
+        var subject = repositoryResult.Value;
+        if (subject.Exams.Count > 0)
+            return Result.Fail([
+                "Cannot delete a subject that has Exams, delete the exams first", ErrorType.BadRequest
+            ]);
+
+        _subjectRepository.Delete(subject);
         await unitOfWork.CommitAsync();
 
         return Result.Ok();

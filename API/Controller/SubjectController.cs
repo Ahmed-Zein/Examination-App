@@ -1,3 +1,4 @@
+using API.Helper;
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
@@ -59,10 +60,9 @@ public class SubjectController(ISubjectService subjectService) : ControllerBase
     public async Task<ActionResult> DeleteSubject(int subjectId)
     {
         var serviceResult = await subjectService.DeleteSubject(subjectId);
-        return serviceResult switch
-        {
-            { IsSuccess: true } => NoContent(),
-            { IsSuccess: false } => NotFound(JsonResponse<SubjectDto>.Error(serviceResult.Errors))
-        };
+        if (serviceResult.IsSuccess)
+            return NoContent();
+
+        return (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors);
     }
 }

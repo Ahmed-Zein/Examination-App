@@ -16,6 +16,10 @@ public class CreateExamDto : ExamDtoBase
 {
 }
 
+public class UpdateExamDto : ExamDtoBase
+{
+}
+
 public class StudentExam : ExamDtoBase
 {
     public int Id { get; set; }

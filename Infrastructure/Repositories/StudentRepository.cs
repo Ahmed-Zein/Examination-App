@@ -21,13 +21,17 @@ public class StudentRepository(
             .Where(role => role.Name!.Equals(AuthRolesConstants.Student))
             .Select(role => role.Id).FirstOrDefaultAsync();
 
-        // Used instead of writing two queries to get all students userIds then fetch them on another query 
-        var studentsQuery = from user in context.Users
-            join userRole in context.UserRoles on user.Id equals userRole.UserId
-            where userRole.RoleId == studentRole
-            select user;
+        var studentsQuery = context.Users
+            .Join(context.UserRoles, user => user.Id, userRole => userRole.UserId, (user, _) => user)
+            .AsNoTracking();
+        // // Used instead of writing two queries to get all students userIds then fetch them on another query 
+        // var studentsQuery =
+        //     from user in context.Users
+        //     join userRole in context.UserRoles on user.Id equals userRole.UserId
+        //     where userRole.RoleId == studentRole
+        //     select user;
 
-        return await PagedData<AppUser>.CreateAsync(studentsQuery.AsNoTracking(), query);
+        return await PagedData<AppUser>.CreateAsync(studentsQuery, query);
     }
 
     public async Task<bool> Exists(string userId)

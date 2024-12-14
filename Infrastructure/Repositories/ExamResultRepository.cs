@@ -1,5 +1,6 @@
 using Application.Interfaces.Persistence;
 using Application.Models;
+using Core.Constants;
 using Core.Entities;
 using FluentResults;
 using Infrastructure.Data;
@@ -45,7 +46,7 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
     {
         var exam = await context.ExamResults.Include(e => e.Exam)
             .FirstOrDefaultAsync(e => e.Id == id);
-        return exam is not null ? Result.Ok(exam) : Result.Fail("exam not found");
+        return exam is not null ? Result.Ok(exam) : Result.Fail(["exam not found", ErrorType.NotFound]);
     }
 
     public void Delete(ExamResult entity)
