@@ -3,6 +3,7 @@ using Application.Models;
 using AutoMapper;
 using AutoMapper.Internal;
 using Core.Entities;
+using Core.Enums;
 
 namespace Application.Mappers;
 
@@ -15,13 +16,20 @@ public class AppMappersProfiles : Profile
         _subjectMapper();
         _studentMapper();
         _questionMapper();
+        _pagedDataMapper();
         _examResultMapper();
     }
 
     private void _studentMapper()
     {
         CreateMap<AppUser, StudentDto>().ReverseMap();
+        CreateMap<AppUser, StudentBaseDto>().ReverseMap();
+    }
+
+    private void _pagedDataMapper()
+    {
         CreateMap<PagedData<AppUser>, PagedData<StudentDto>>().ReverseMap();
+        CreateMap<PagedData<ExamResult>, PagedData<ExamResultDto>>().ReverseMap();
     }
 
     private void _subjectMapper()
@@ -54,9 +62,7 @@ public class AppMappersProfiles : Profile
     private void _examResultMapper()
     {
         CreateMap<ExamResultDto, ExamResult>().ReverseMap()
-            .ForMember(e => e.StudentEmail,
-                opt => opt.MapFrom(src => src.AppUser.Email))
-            .ForMember(e => e.StudentId,
-                opt => opt.MapFrom(src => src.AppUser.Id));
+            .ForMember(e => e.Student,
+                opt => opt.MapFrom<AppUser>(e => e.AppUser));
     }
 }

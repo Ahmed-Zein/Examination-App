@@ -1,4 +1,5 @@
 using Application.Interfaces.Persistence;
+using Application.Models;
 using Core.Entities;
 using FluentResults;
 using Infrastructure.Data;
@@ -13,11 +14,31 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
         return context.ExamResults.AnyAsync(e => e.Id == id);
     }
 
+    public Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery query)
+    {
+        var examResultsQuery = context.ExamResults
+            .Include(e => e.AppUser)
+            .OrderBy(e => e.StartTime)
+            .AsNoTracking();
+
+        return PagedData<ExamResult>.CreateAsync(examResultsQuery, query);
+    }
+
     public async Task<List<ExamResult>> GetAllAsync()
     {
         return await context.ExamResults
             .Include(e => e.AppUser)
             .ToListAsync();
+    }
+
+    public async Task<Result<PagedData<ExamResult>>> GetByStudentId(string studentId, PaginationQuery pagination)
+    {
+        var examQuery = context.ExamResults
+            .Where(e => e.AppUserId == studentId)
+            .OrderBy(e => e.StartTime)
+            .AsNoTracking();
+
+        return Result.Ok(await PagedData<ExamResult>.CreateAsync(examQuery, pagination));
     }
 
     public async Task<Result<ExamResult>> GetByIdAsync(int id)
@@ -54,11 +75,5 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
         if (examResult.StartTime + examDuration < toUpdate.EndTime) examResult.StudentScore = toUpdate.StudentScore;
 
         return Result.Ok(examResult);
-    }
-
-    public async Task<Result<List<ExamResult>>> GetByStudentId(string studentId)
-    {
-        var exam = await context.ExamResults.Where(e => e.AppUserId == studentId).ToListAsync();
-        return Result.Ok(exam);
     }
 }

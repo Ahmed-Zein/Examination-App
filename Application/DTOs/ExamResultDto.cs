@@ -9,7 +9,6 @@ public class ExamResultDto
     public ExamResultStatus Status { get; set; } = ExamResultStatus.UnSubmitted;
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public string StudentId { get; set; } = string.Empty;
-    public string StudentEmail { get; set; } = string.Empty;
+    public StudentBaseDto Student { get; set; }
     public int ExamId { get; set; }
 }

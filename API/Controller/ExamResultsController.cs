@@ -1,6 +1,7 @@
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Models;
 using Core.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,21 +15,22 @@ public class ExamResultsController(IExamResultService examResultService) : Contr
 {
     [HttpGet("results")]
     [Authorize(Roles = AuthRolesConstants.Admin)]
-    public async Task<ActionResult<JsonResponse<List<ExamResultDto>>>> GetAll()
+    public async Task<ActionResult<JsonResponse<PagedData<ExamResultDto>>>> GetAll([FromQuery] PaginationQuery query)
     {
-        var examResults = await examResultService.GetAllExamResults();
-        return Ok(JsonResponse<List<ExamResultDto>>.Ok(examResults));
+        var examResults = await examResultService.GetAllExamResults(query);
+        return Ok(JsonResponse<PagedData<ExamResultDto>>.Ok(examResults));
     }
 
     [HttpGet("{studentId}/results")]
-    public async Task<ActionResult<JsonResponse<List<ExamResultDto>>>> GetAllByStudentId(string studentId)
+    public async Task<ActionResult<JsonResponse<PagedData<ExamResultDto>>>> GetAllByStudentId(
+        [FromQuery] PaginationQuery pagination, string studentId)
     {
-        var serviceResults = await examResultService.GetAllByStudentId(studentId);
+        var serviceResults = await examResultService.GetAllByStudentId(studentId, pagination);
 
         return serviceResults switch
         {
-            { IsSuccess: true } => Ok(JsonResponse<List<ExamResultDto>>.Ok(serviceResults.Value)),
-            { IsSuccess: false } => NotFound(JsonResponse<List<ExamResultDto>>.Error(serviceResults.Errors))
+            { IsSuccess: true } => Ok(JsonResponse<PagedData<ExamResultDto>>.Ok(serviceResults.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<PagedData<ExamResultDto>>.Error(serviceResults.Errors))
         };
     }
 }
