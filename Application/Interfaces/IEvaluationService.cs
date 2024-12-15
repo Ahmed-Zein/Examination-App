@@ -1,6 +1,10 @@
+using Application.DTOs;
+using FluentResults;
+
 namespace Application.Interfaces;
 
 public interface IEvaluationService
 {
-    Task Evaluate();
+    Task<Result> ReceiveExamSolution(int examId, ExamSolutionsDto examSolutionsDto);
+    Task<Result> EvaluateExam(int examId, ExamSolutionsDto examSolutionsDto);
 }

@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{DE49C187-5984-4994-8227-5D4793E2D9F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitEvaluator", "RabbitEvaluator\RabbitEvaluator.csproj", "{5711C018-C3DE-4541-A42C-21D387F603ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,5 +37,9 @@ Global
 		{DE49C187-5984-4994-8227-5D4793E2D9F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE49C187-5984-4994-8227-5D4793E2D9F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE49C187-5984-4994-8227-5D4793E2D9F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5711C018-C3DE-4541-A42C-21D387F603ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5711C018-C3DE-4541-A42C-21D387F603ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5711C018-C3DE-4541-A42C-21D387F603ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5711C018-C3DE-4541-A42C-21D387F603ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

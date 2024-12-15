@@ -11,11 +11,10 @@ using FluentResults;
 namespace Application.Services;
 
 public class ExamService(
+    IMapper mapper,
     IUnitOfWork unitOfWork,
-    AddQuestionToExamValidator questionToExamValidator,
     CreateExamDtoValidator createExamDtoValidator,
-    IMapper mapper)
-    : IExamService
+    AddQuestionToExamValidator questionToExamValidator) : IExamService
 {
     private readonly IExamRepository _examRepository = unitOfWork.ExamRepository;
 
@@ -56,7 +55,7 @@ public class ExamService(
     }
 
 
-    public async Task<Result<StudentExam>> GetRandomExam(string userId, int subjectId)
+    public async Task<Result<StudentExam>> PullExam(string userId, int subjectId)
     {
         var examIds = await _examRepository.GetAllExamIds(subjectId);
         if (examIds.Count == 0)
@@ -77,6 +76,7 @@ public class ExamService(
         await unitOfWork.CommitAsync();
 
         var studentExamDto = mapper.Map<StudentExam>(exam);
+        studentExamDto.ExamResultId = examResult.Id;
 
         return Result.Ok(studentExamDto);
     }
@@ -93,44 +93,6 @@ public class ExamService(
         await _examRepository.UpdateExamQuestions(questionDto.ExamId, questionDto.QuestionIds);
         await unitOfWork.CommitAsync();
 
-        return Result.Ok();
-    }
-
-    public async Task<Result> EvaluateExam(string userId, int examId, ExamSolutionsDto examSolutionsDto)
-    {
-        var repositoryResult = await unitOfWork.ExamResultRepository.GetByIdAsync(examSolutionsDto.ExamResultId);
-
-        if (!repositoryResult.IsSuccess)
-            return Result.Fail(repositoryResult.Errors);
-
-        var examResult = repositoryResult.Value;
-        if (examResult.Status is ExamResultStatus.Evaluated)
-            return Result.Fail(["The exam is already evaluated", ErrorType.Conflict]);
-
-        var examQuestions = await unitOfWork.QuestionRepository.GetByExamId(examId);
-        var studentScore = 0;
-        foreach (var solution in examSolutionsDto.Solutions)
-        {
-            var question = examQuestions.Find(q => q.Id == solution.QuestionId);
-            if (question is null)
-                return Result.Fail(["The question does not exists", ErrorType.BadRequest]);
-
-            var answer = question.Answers.Find(an => an.Id == solution.AnswerId);
-            if (answer is null)
-                return Result.Fail(["The question does not have a valid answer", ErrorType.BadRequest]);
-            if (answer.IsCorrect)
-                studentScore += 1;
-        }
-
-        var endTime = DateTime.UtcNow;
-
-        if (examResult.Exam is not null
-            && examResult.StartTime + examResult.Exam.Duration >= endTime)
-            examResult.StudentScore = studentScore;
-
-        examResult.Status = ExamResultStatus.Evaluated;
-        examResult.EndTime = endTime;
-        await unitOfWork.CommitAsync();
         return Result.Ok();
     }
 

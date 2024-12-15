@@ -44,9 +44,14 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
 
     public async Task<Result<ExamResult>> GetByIdAsync(int id)
     {
-        var exam = await context.ExamResults.Include(e => e.Exam)
-            .FirstOrDefaultAsync(e => e.Id == id);
-        return exam is not null ? Result.Ok(exam) : Result.Fail(["exam not found", ErrorType.NotFound]);
+        var exam = await context.ExamResults
+            .Where(e => e.Id == id)
+            .Include(e => e.Exam)
+            .FirstOrDefaultAsync();
+
+        return exam is not null
+            ? Result.Ok(exam)
+            : Result.Fail(["Exam Result not found", ErrorType.NotFound]);
     }
 
     public void Delete(ExamResult entity)

@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<IStudentServices, StudentServices>();
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IEvaluationService, EvaluationService>();
         services.AddScoped<IExamResultService, ExamResultService>();
 
         services.AddAutoMapper(typeof(AppMappersProfiles));

@@ -3,6 +3,8 @@ using API.Helper;
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Models;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,7 @@ namespace API.Controller;
 [Authorize]
 [ApiController]
 [Route("api/subjects/{subjectId:int:min(0)}/exams")]
-public class ExamController(IExamService examService) : ControllerBase
+public class ExamController(IExamService examService, IEvaluationService evaluationService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = "Admin")]
@@ -83,7 +85,7 @@ public class ExamController(IExamService examService) : ControllerBase
         if (userId is null)
             return Unauthorized(JsonResponse<StudentExam>.Error(["Invalid user Token"]));
 
-        var serviceResult = await examService.GetRandomExam(userId, subjectId);
+        var serviceResult = await examService.PullExam(userId, subjectId);
         return serviceResult switch
         {
             { IsSuccess: true } => Ok(JsonResponse<StudentExam>.Ok(serviceResult.Value)),
@@ -95,25 +97,24 @@ public class ExamController(IExamService examService) : ControllerBase
     public async Task<ActionResult<JsonResponse<StudentExam>>> EvaluateStudentExam(int examId, int subjectId,
         [FromBody] ExamSolutionsDto examSolutionsDto)
     {
-        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId is null)
-            return Unauthorized(JsonResponse<StudentExam>.Error(["Invalid user Token"]));
+        var serviceResult = await evaluationService.ReceiveExamSolution(examId, examSolutionsDto);
 
-        var serviceResult = await examService.EvaluateExam(userId, examId, examSolutionsDto);
-
-        if (serviceResult.IsSuccess)
-            return NoContent();
-
-        return (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => NoContent(),
+            { IsSuccess: false } => (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors)
+        };
     }
 
     [HttpDelete("{examId:int:min(1)}")]
     public async Task<ActionResult<JsonResponse<StudentExam>>> DeleteExam(int examId, int subjectId)
     {
         var serviceResult = await examService.DeleteExam(examId);
-        if (serviceResult.IsSuccess)
-            return NoContent();
 
-        return (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => NoContent(),
+            { IsSuccess: false } => (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors)
+        };
     }
 }

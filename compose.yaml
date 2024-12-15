@@ -9,20 +9,34 @@
       - "1433:1433"
     volumes:
       - sql_data:/var/opt/mssql
-  
-  mailserver:
-    image: rnwood/smtp4dev
-    container_name: mail-server
+  rabbitmq:
+    container_name: rabbit
+    image: rabbitmq:3-management
     ports:
-      - "5000:80"
-      - "2525:25"
+      - "5673:15672"
+      - "5672:5672"
+    hostname: rmq
+    environment:
+      RABBITMQ_DEFAULT_USER: greybeast
+      RABBITMQ_DEFAULT_PASS: string123
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
 
 volumes:
   sql_data:
     driver: local
+  rabbit_data:
 
 #  api:
 #    image: api
 #    build:
 #      context: .
 #      dockerfile: API/Dockerfile
+
+#  mailserver:
+#    image: rnwood/smtp4dev
+#    container_name: mail-server
+#    ports:
+#      - "5000:80"
+#      - "2525:25"
+#
