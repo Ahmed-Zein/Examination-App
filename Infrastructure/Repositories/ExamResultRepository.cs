@@ -19,7 +19,7 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
     {
         var examResultsQuery = context.ExamResults
             .Include(e => e.AppUser)
-            .OrderBy(e => e.StartTime)
+            .OrderByDescending(e=>e.StartTime)
             .AsNoTracking();
 
         return PagedData<ExamResult>.CreateAsync(examResultsQuery, query);
@@ -36,7 +36,7 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
     {
         var examQuery = context.ExamResults
             .Where(e => e.AppUserId == studentId)
-            .OrderBy(e => e.StartTime)
+            .OrderByDescending(e=>e.StartTime)
             .AsNoTracking();
 
         return Result.Ok(await PagedData<ExamResult>.CreateAsync(examQuery, pagination));

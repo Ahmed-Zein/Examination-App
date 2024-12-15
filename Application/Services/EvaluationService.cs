@@ -20,6 +20,8 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
 
         var examResult = validationResult.Value;
         examResult.Status = ExamResultStatus.InEvaluation;
+        examResult.EndTime = DateTime.UtcNow;
+
         await unitOfWork.CommitAsync();
         await rabbitPublisher.Publish(new RabbitExamRequest() { ExamId = examId, Solutions = examSolutionsDto });
         return Result.Ok();
@@ -47,7 +49,7 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
                 studentScore += 1;
         }
 
-        var endTime = DateTime.UtcNow;
+        var endTime = examResult.EndTime ?? DateTime.UtcNow;
 
         if (examResult.Exam is not null
             && examResult.StartTime + examResult.Exam.Duration >= endTime)
