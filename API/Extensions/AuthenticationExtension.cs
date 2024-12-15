@@ -3,7 +3,7 @@ using API.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace API;
+namespace API.Extensions;
 
 public static class AuthenticationExtension
 {

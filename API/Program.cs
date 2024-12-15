@@ -1,9 +1,21 @@
 using API;
+using API.Extensions;
 using API.Middleware;
 using Application;
 using Infrastructure;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog(((context, configuration) =>
+{
+    configuration.WriteTo.Console();
+    configuration.ReadFrom.Configuration(context.Configuration);
+}));
 
 builder.Services.AddSwagger();
 builder.Services.AddControllers();
@@ -31,5 +43,7 @@ app.UseAuthorization();
 
 app.UseLockedOutMiddleware();
 app.MapControllers();
+
+app.UseSerilogRequestLogging();
 
 app.Run();
