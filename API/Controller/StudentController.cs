@@ -11,7 +11,7 @@ namespace API.Controller;
 [Authorize]
 [ApiController]
 [Route("api/students")]
-public class StudentController(IStudentServices studentServices) : ControllerBase
+public class StudentController(IStudentServices studentServices, IDashboardService dashboardService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = AuthRolesConstants.Admin)]
@@ -42,6 +42,17 @@ public class StudentController(IStudentServices studentServices) : ControllerBas
         {
             { IsSuccess: true } => Ok(JsonResponse<StudentDto>.Ok(serviceResult.Value)),
             { IsSuccess: false } => NotFound(JsonResponse<StudentDto>.Error(serviceResult.Errors))
+        };
+    }
+
+    [HttpGet("{studentId}/dashboard")]
+    public async Task<ActionResult<JsonResponse<StudentDashboard>>> Dashboard(string studentId)
+    {
+        var serviceResult = await dashboardService.GetStudentDashboard(studentId);
+        return serviceResult switch
+        {
+            { IsSuccess: true } => Ok(JsonResponse<StudentDashboard>.Ok(serviceResult.Value)),
+            { IsSuccess: false } => NotFound(JsonResponse<StudentDashboard>.Error(serviceResult.Errors))
         };
     }
 }
