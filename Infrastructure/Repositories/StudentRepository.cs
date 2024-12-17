@@ -41,13 +41,11 @@ public class StudentRepository(
 
     public async Task<Result<AppUser>> GetByIdAsync(string id)
     {
-        var user = await userManager.FindByIdAsync(id);
-        if (user == null)
-            return Result.Fail<AppUser>(["User not found", ErrorType.NotFound]);
+        var user = await context.Users
+            .Include(user => user.ExamResults.OrderByDescending(e => e.StartTime))
+            .FirstOrDefaultAsync(user => user.Id == id);
 
-        var userExamResults = await context.ExamResults.Where(e => e.AppUserId == user.Id).ToListAsync();
-        user.ExamResults = userExamResults;
-        return Result.Ok(user);
+        return user is not null ? Result.Ok(user) : Result.Fail<AppUser>(["User not found", ErrorType.NotFound]);
     }
 
     public async Task<Result<AppUser>> UpdateUserLock(string studentId)

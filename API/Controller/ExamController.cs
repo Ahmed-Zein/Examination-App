@@ -97,7 +97,8 @@ public class ExamController(IExamService examService, IEvaluationService evaluat
     public async Task<ActionResult<JsonResponse<StudentExam>>> EvaluateStudentExam(int examId, int subjectId,
         [FromBody] ExamSolutionsDto examSolutionsDto)
     {
-        var serviceResult = await evaluationService.ReceiveExamSolution(examId, examSolutionsDto);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value!;
+        var serviceResult = await evaluationService.ReceiveExamSolution(userId, examId, examSolutionsDto);
 
         return serviceResult switch
         {

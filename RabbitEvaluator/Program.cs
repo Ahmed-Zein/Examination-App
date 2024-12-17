@@ -1,6 +1,8 @@
 ﻿using Application;
 using Core.Interfaces;
 using Infrastructure;
+using Infrastructure.Signalr;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,20 +12,37 @@ internal static class Program
 {
     public static async Task Main(string[] args)
     {
-        var configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.SetBasePath("/home/ava/dev/atos/ExaminationSystem/API/");
-        var configuration = configurationBuilder.AddJsonFile("appsettings.Development.json").Build();
+        var configurationBuilder = new ConfigurationBuilder()
+            .SetBasePath("/home/ava/dev/atos/ExaminationSystem/API/")
+            .AddJsonFile("appsettings.Development.json");
+        var configuration = configurationBuilder.Build();
 
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddApplication();
-        services.AddSingleton<IConfiguration>(configuration);
-        services.AddInfrastructure(configuration, null);
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Configuration.Bind(configuration);
 
-        var serviceProvider = services.BuildServiceProvider();
+        builder.Services.AddLogging();
+        builder.Services.AddApplication();
+        builder.Services.AddSingleton<IConfiguration>(configuration);
+        builder.Services.AddInfrastructure(configuration, builder.Environment);
+
+        var serviceProvider = builder.Services.BuildServiceProvider();
 
         var rabbitConsumer = serviceProvider.GetRequiredService<IRabbitConsumer>();
-        _ = await rabbitConsumer.Consume();
+        var signalrManager = serviceProvider.GetRequiredService<ISignalrClientContext>();
+        try
+        {
+            await signalrManager.EstablishConnection();
+            var notificationInitiator = serviceProvider.GetRequiredService<IClientNotificationInitiator>();
+            await notificationInitiator.SendBroadCastNotification("The rabbit says Hi");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        finally
+        {
+            _ = await rabbitConsumer.Consume();
+        }
 
         Console.ReadLine();
     }

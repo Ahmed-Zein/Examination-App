@@ -4,6 +4,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.RabbitMQ;
 using Infrastructure.Repositories;
+using Infrastructure.Signalr;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,19 +17,22 @@ namespace Infrastructure;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration,
-        IWebHostEnvironment? environment)
+        IWebHostEnvironment environment)
     {
+        services.AddSignalR();
+        services.AddScoped<ISignalrClientContext, SignalrClientContext>();
+        services.AddScoped<IClientNotificationInitiator, ClientNotificationManager>();
+
         services.AddScoped<IRabbitConfig, RabbitConfig>();
         services.AddScoped<IRabbitPublisher, RabbitPublisher>();
         services.AddScoped<IRabbitConsumer, RabbitEvaluationConsumer>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-
         services.AddDbContext<AppDbContext>(options =>
         {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ??
                                  throw new ArgumentNullException($"No connection string"));
-            if (environment is not null && environment.IsDevelopment()) options.EnableSensitiveDataLogging();
+            if (environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
 
         services.AddIdentity<AppUser, IdentityRole>(options =>

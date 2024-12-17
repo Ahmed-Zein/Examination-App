@@ -1,8 +1,8 @@
-using API;
 using API.Extensions;
 using API.Middleware;
 using Application;
 using Infrastructure;
+using Infrastructure.Signalr;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -11,11 +11,11 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog(((context, configuration) =>
+builder.Host.UseSerilog((context, configuration) =>
 {
     configuration.WriteTo.Console();
     configuration.ReadFrom.Configuration(context.Configuration);
-}));
+});
 
 builder.Services.AddSwagger();
 builder.Services.AddControllers();
@@ -45,5 +45,6 @@ app.UseLockedOutMiddleware();
 app.MapControllers();
 
 app.UseSerilogRequestLogging();
+app.MapHub<ServerNotificationManager>("/notification");
 
 app.Run();

@@ -12,7 +12,7 @@ namespace Application.Services;
 
 public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPublisher) : IEvaluationService
 {
-    public async Task<Result> ReceiveExamSolution(int examId, ExamSolutionsDto examSolutionsDto)
+    public async Task<Result> ReceiveExamSolution(string studentId, int examId, ExamSolutionsDto examSolutionsDto)
     {
         var validationResult = await IsValidExamSolution(examId, examSolutionsDto);
         if (!validationResult.IsSuccess)
@@ -23,7 +23,9 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
         examResult.EndTime = DateTime.UtcNow;
 
         await unitOfWork.CommitAsync();
-        await rabbitPublisher.Publish(new RabbitExamRequest() { ExamId = examId, Solutions = examSolutionsDto });
+
+        await rabbitPublisher.Publish(new RabbitExamRequest()
+            { StudentId = studentId, ExamId = examId, Solutions = examSolutionsDto });
         return Result.Ok();
     }
 

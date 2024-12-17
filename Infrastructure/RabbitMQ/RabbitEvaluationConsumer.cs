@@ -3,13 +3,17 @@ using System.Text.Json;
 using Application.Interfaces;
 using Application.Models;
 using Core.Interfaces;
+using Infrastructure.Signalr;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace Infrastructure.RabbitMQ;
 
-public class RabbitEvaluationConsumer(IRabbitConfig config, IEvaluationService examService)
-    : IRabbitConsumer, IDisposable
+public class RabbitEvaluationConsumer(
+    IRabbitConfig config,
+    IEvaluationService examService,
+    IClientNotificationInitiator clientNotificationInitiator
+) : IRabbitConsumer, IDisposable
 {
     private readonly ConnectionFactory _connectionFactory = new()
     {
@@ -51,6 +55,16 @@ public class RabbitEvaluationConsumer(IRabbitConfig config, IEvaluationService e
                 return;
 
             await examService.EvaluateExam(evaluationRequest.ExamId, evaluationRequest.Solutions);
+
+            try
+            {
+                await clientNotificationInitiator.SendNotificationToUser(evaluationRequest.StudentId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
             await _channel.BasicAckAsync(eventArgs.DeliveryTag, false);
         };
 
@@ -62,6 +76,7 @@ public class RabbitEvaluationConsumer(IRabbitConfig config, IEvaluationService e
     public void Dispose()
     {
         Console.WriteLine("Stopping RabbitEvaluationConsumer");
+
         _channel?.Dispose();
         _connection?.Dispose();
     }
