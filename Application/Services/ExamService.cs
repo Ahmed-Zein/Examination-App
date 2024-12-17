@@ -57,13 +57,11 @@ public class ExamService(
 
     public async Task<Result<StudentExam>> PullExam(string userId, int subjectId)
     {
-        var examIds = await _examRepository.GetAllExamIds(subjectId);
-        if (examIds.Count == 0)
+        var repositoryResult = await _examRepository.GetRandomExam(subjectId);
+        if (!repositoryResult.IsSuccess)
             return Result.Fail(["No exams found", ErrorType.NotFound]);
 
-        var randomIndex = new Random().Next(0, examIds.Count);
-
-        var exam = (await _examRepository.GetByIdAsync(examIds[randomIndex])).Value;
+        var exam = repositoryResult.Value;
         var examResult = new ExamResult
         {
             ExamId = exam.Id,

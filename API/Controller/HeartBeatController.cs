@@ -7,7 +7,7 @@ namespace API.Controller;
 
 [Route("api/heartbeat")]
 [ApiController]
-public class HeartBeatController(IRabbitPublisher rabbit, IHubContext<ServerNotificationManager, INotificationClient> context)
+public class HeartBeatController(IRabbitPublisher rabbit, IHubContext<ServerNotificationHub, INotificationClient> context)
     : ControllerBase
 {
     [HttpGet]

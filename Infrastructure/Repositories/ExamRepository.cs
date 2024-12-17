@@ -75,15 +75,21 @@ public class ExamRepository(AppDbContext context) : IExamRepository
         return Result.Ok(exams);
     }
 
-    public async Task<List<int>> GetAllExamIds(int subjectId)
+    public async Task<Result<Exam>> GetRandomExam(int subjectId)
     {
-        var exams = await
+        var examId = await
             context.Exams
                 .Where(exam => exam.SubjectId == subjectId)
                 .Join(context.ExamQuestions, exam => exam.Id, examQuestion => examQuestion.ExamId,
-                    (exam, examQuestion) => examQuestion.ExamId)
-                .ToListAsync();
-        return exams;
+                    (exam, examQuestion) => exam)
+                .OrderBy(exam => new Guid())
+                .Select(exam => exam.Id)
+                .FirstOrDefaultAsync();
+        if (examId is 0)
+            return Result.Fail(["Exam not found", ErrorType.NotFound]);
+
+        var exam = await GetByIdAsync(examId);
+        return exam.IsSuccess ? Result.Ok(exam.Value) : Result.Fail("Failed to get exam");
     }
 
 

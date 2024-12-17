@@ -45,6 +45,6 @@ app.UseLockedOutMiddleware();
 app.MapControllers();
 
 app.UseSerilogRequestLogging();
-app.MapHub<ServerNotificationManager>("/notification");
+app.MapHub<ServerNotificationHub>("/notification");
 
 app.Run();

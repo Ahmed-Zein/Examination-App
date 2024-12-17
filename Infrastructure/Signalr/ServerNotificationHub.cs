@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Infrastructure.Signalr;
 
 [Authorize]
-public class ServerNotificationManager : Hub<INotificationClient>, IServerNotificationManager
+public class ServerNotificationHub : Hub<INotificationClient>, IServerNotificationManager
 {
     private const string AdminGroupName = AuthRolesConstants.Admin;
 
