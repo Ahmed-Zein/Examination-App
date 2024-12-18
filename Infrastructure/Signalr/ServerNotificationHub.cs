@@ -24,7 +24,6 @@ public class ServerNotificationHub : Hub<INotificationClient>, IServerNotificati
         await Clients.User(userId).ReceiveNotification("Your exam evaluation has been completed.", 1);
     }
 
-
     public async Task BroadCast(string message)
     {
         await Clients.All.ReceiveNotification(message);

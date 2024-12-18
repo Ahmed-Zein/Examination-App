@@ -11,19 +11,16 @@ namespace Infrastructure.Repositories;
 
 public class StudentRepository(
     AppDbContext context,
-    UserManager<AppUser> userManager,
-    RoleManager<IdentityRole> roleManager)
+    UserManager<AppUser> userManager)
     : IStudentRepository
 {
     public async Task<PagedData<AppUser>> GetAllAsync(PaginationQuery query)
     {
-        var studentRole = await roleManager.Roles
-            .Where(role => role.Name!.Equals(AuthRolesConstants.Student))
-            .Select(role => role.Id).FirstOrDefaultAsync();
-
-        var studentsQuery = context.Users
-            .Join(context.UserRoles, user => user.Id, userRole => userRole.UserId, (user, _) => user)
-            .AsNoTracking();
+        var studentsQuery =
+            context.Roles.Where(role => role.Name!.Equals(AuthRolesConstants.Student)).Join(context.UserRoles,
+                    role => role.Id, userRole => userRole.RoleId, (role, userRoles) => userRoles)
+                .Join(context.Users, userRole => userRole.UserId, user => user.Id, (userRole, user) => user)
+                .AsNoTracking();
         // // Used instead of writing two queries to get all students userIds then fetch them on another query 
         // var studentsQuery =
         //     from user in context.Users

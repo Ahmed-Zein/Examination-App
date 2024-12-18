@@ -21,9 +21,7 @@ public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, 
     public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
     public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
     public IExamResultRepository ExamResultRepository => _examResultRepository ??= new ExamResultRepository(context);
-
-    public IStudentRepository StudentRepository =>
-        _studentRepository ??= new StudentRepository(context, userManager, roleManager);
+    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(context, userManager);
 
     public IDashboardRepository DashboardRepository =>
         _dashboardRepository ??= new DashboardRepository(context, roleManager);
