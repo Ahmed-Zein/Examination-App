@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
+using Application.Interfaces.Persistence;
 using Core.Constants;
 using Core.Entities;
 using FluentResults;
@@ -56,16 +57,6 @@ public sealed class AuthService(
         return Result.Ok(AuthenticationResponseDto.Success(token, "Login successful"));
     }
 
-    public async Task<Result<AppUser>> CheckCredentials(string email, string password)
-    {
-        var user = await userManager.FindByEmailAsync(email);
-
-        if (user is null || !await userManager.CheckPasswordAsync(user, password))
-            return Result.Fail("Invalid credentials");
-
-        return Result.Ok(user);
-    }
-
     public async Task<Result<bool>> IsUserLockedOut(string userId)
     {
         var user = await userManager.FindByIdAsync(userId);
@@ -84,5 +75,15 @@ public sealed class AuthService(
                 "Two-factor authentication is required."),
             _ => Result.Fail<AuthenticationResponseDto>("Invalid credentials.")
         };
+    }
+
+    private async Task<Result<AppUser>> CheckCredentials(string email, string password)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+
+        if (user is null || !await userManager.CheckPasswordAsync(user, password))
+            return Result.Fail("Invalid credentials");
+
+        return Result.Ok(user);
     }
 }

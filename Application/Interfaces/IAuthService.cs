@@ -8,6 +8,5 @@ public interface IAuthService
 {
     Task<Result<AuthenticationResponseDto>> Register(RegisterRequestDto registerRequestDto);
     Task<Result<AuthenticationResponseDto>> Login(LoginRequestDto loginRequestDto);
-    Task<Result<AppUser>> CheckCredentials(string email, string password);
     Task<Result<bool>> IsUserLockedOut(string userId);
 }
