@@ -1,0 +1,17 @@
+.drawer {
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .drawer {
+    width: 4rem; /* Reduce width to fit just the icons */
+  }
+
+  .nav-link {
+    justify-content: center; /* Center the icon */
+  }
+
+  .nav-link i {
+    font-size: 1.2rem; /* Optional: Adjust icon size */
+  }
+}

@@ -1,0 +1,66 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm p-4 border-0 rounded-lg">
+        <div class="card-body">
+          <h4 class=" text-center text-dark">Welcome Back.</h4>
+          <h4 class="card-title text-center mb-4 text-dark">Sign in to continue</h4>
+          <!-- THE FORM -->
+          <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+            <div class="form-group mb-3">
+              <label class="col-form-label-sm text-muted" for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                class="form-control p-2 rounded-2"
+                [class]="{'is-invalid': formGroup.get('email')?.invalid && formGroup.get('email')?.touched}"
+                placeholder="Enter your email"
+              >
+              <!-- Error Message for Email -->
+              <div *ngIf="formGroup.get('email')?.invalid && formGroup.get('email')?.touched"
+                   class="text-danger small mt-1">
+                <div *ngIf="formGroup.get('email')?.errors?.['required']">Email is required.</div>
+                <div *ngIf="formGroup.get('email')?.errors?.['email']">Enter a valid email address.</div>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="col-form-label-sm text-muted" for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                class="form-control p-2 rounded-2"
+                [class]="{'is-invalid': formGroup.get('password')?.invalid && formGroup.get('password')?.touched}"
+                placeholder="Enter your password"
+              >
+              <!-- Error Message for Password -->
+              <div *ngIf="formGroup.get('password')?.invalid && formGroup.get('password')?.touched"
+                   class="text-danger small mt-1">
+                <div *ngIf="formGroup.get('password')?.errors?.['required']">Password is required.</div>
+                <div *ngIf="formGroup.get('password')?.errors?.['minlength']">Password must be at least 6 characters
+                  long.
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mb-3">
+              <button class="btn btn-dark rounded-2">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm ms-2" role="status"
+                        aria-hidden="true"></span>
+                }
+              </button>
+            </div>
+          </form>
+          <p class="mt-3 text-center text-muted">
+            Don't have an account?
+            <a routerLink="/auth/register" class="link-dark">Create account</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

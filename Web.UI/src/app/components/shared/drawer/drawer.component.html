@@ -1,0 +1,18 @@
+<div class="drawer d-inline-flex bg-light vh-100">
+  <div class="d-flex flex-column align-items-start py-3" style="padding-right: 2rem">
+    <ul class="nav flex-column ">
+      @for (action of drawerActions; track action.title) {
+        <li class="nav-item mb-3" [attr.data-bs-placement]="'right'" [attr.data-bs-toggle]="'tooltip'"
+            [attr.title]="action.title">
+          <a class="nav-link text-secondary d-flex align-items-center" [routerLink]="action.path">
+            <i [class]="action.icon"></i>
+            <!-- Hide the text on small screens -->
+            <span class="d-none d-md-inline ms-2">{{ action.title }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    <button class="btn btn-outline-secondary mt-auto ms-3 mb-4" (click)="logOut()">Logout</button>
+  </div>
+</div>

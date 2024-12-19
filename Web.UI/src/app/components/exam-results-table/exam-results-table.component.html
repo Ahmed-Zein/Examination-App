@@ -1,0 +1,34 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">student</th>
+    <th scope="col" class="text-center">Status</th>
+    <th scope="col">Start Time</th>
+    <th scope="col">End Time</th>
+    <th scope="col">Student Score</th>
+  </tr>
+  </thead>
+  <tbody>
+    @for (result of examResults; let i = $index; track i) {
+      <tr>
+        <td>
+          <div class="d-flex flex-column">
+            <span class="fw-medium h5 m-0">{{ result.student.firstName + ' ' + result.student.lastName }}</span>
+            <small class="text-muted">{{ result.student.email }}</small>
+          </div>
+        <td>
+          <div class="text-center">
+            <app-badge [status]="result.status">
+              {{ result.status | ExamResultStatusPipe }}
+            </app-badge>
+          </div>
+        </td>
+        <td>{{ Utils.toLocalDate(result.startTime) | date: 'medium' }}</td>
+        <td>{{ result.endTime ? (result.endTime | date: 'medium') : '-' }}</td>
+        <td>
+          <strong>{{ result.studentScore }}</strong> / {{ result.totalScore }}
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

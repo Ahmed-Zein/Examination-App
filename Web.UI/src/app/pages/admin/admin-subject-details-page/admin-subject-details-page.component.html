@@ -1,0 +1,102 @@
+@if (isSubjectLoading) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+
+  <main class="row">
+    <div class="col" style="border-right: gainsboro solid 1px;">
+      <!-- Tabs Navigation -->
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation" style="max-width: fit-content;">
+          <button (click)="changeTab(true)" [ngClass]="{'active': isFirstTab}" aria-controls="tab1" aria-selected="true"
+                  class="nav-link" data-bs-target="#tab1" data-bs-toggle="tab" id="tab1-tab" role="tab" type="button">
+            Questions
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button (click)="changeTab(false)" [class]="{'active': !isFirstTab}" aria-controls="tab2"
+                  aria-selected="false" class="nav-link" data-bs-target="#tab2" data-bs-toggle="tab" id="tab2-tab"
+                  role="tab" type="button">
+            Exams
+          </button>
+        </li>
+      </ul>
+
+
+      <!-- Tabs Content -->
+      <div class="tab-content m-4" id="myTabContent">
+        <div [ngClass]="{ 'show active': isFirstTab }" aria-labelledby="tab1-tab" class="tab-pane fade" id="tab1"
+             role="tabpanel">
+          @if (questions.length === 0) {
+            <div class="container m-3 text-center">
+              <p class="text-muted m-0">No Available Question For This Subject</p>
+            </div>
+            <hr class="m-4">
+          }
+          @for (question of questions; track question.id) {
+            <div class="my-3">
+              <app-question-card (deleteQuestion)="deleteQuestion($event)" [showDeleteBtn]="true"
+                                 [question]="question"></app-question-card>
+            </div>
+          }
+          <app-admin-question-form (submit)="onQuestionSubmit()"></app-admin-question-form>
+
+        </div>
+        <div [ngClass]="{ 'show active': !isFirstTab }" aria-labelledby="tab2-tab" class="tab-pane fade" id="tab2"
+             role="tabpanel">
+          @if (exams.length === 0) {
+            <div class="container m-3 text-center">
+              <p class="text-muted m-0">No Available Exams For This Subject</p>
+            </div>
+          }
+          <hr class="m-4">
+          <app-exams-grid [exams]="exams"></app-exams-grid>
+          <div class="m-3"></div>
+          <app-add-new-exam-form (submitExam)="addExam($event)"></app-add-new-exam-form>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-3 pt-1">
+      <div class="card p-2 mb-3 border-1 border-opacity-25 " style="background-color: #f4f4f9; color: #333;">
+        <div class="card-body">
+          <div class="d-flex justify-content-end align-items-end">
+            <button
+              class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+              (click)="toggleEdit()">
+              <i class="bi bi-pencil me-2"></i>
+              {{ editing ? 'Save' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="mb-3">
+            <label for="subjectName" class="form-label" style="color: #6c757d;">
+              <strong>Subject Name:</strong>
+            </label>
+            <input
+              id="subjectName"
+              type="text"
+              class="form-control"
+              [(ngModel)]="subject.name"
+              [disabled]="!editing"
+              placeholder="Enter subject name"
+              style="background-color: #ffffff; border: 1px solid #ced4da; color: #333;"
+            />
+          </div>
+
+          <p style="color: #495057;">
+            <strong># Questions:</strong> {{ questions.length }}
+          </p>
+          <p style="color: #495057;">
+            <strong># Exams:</strong> {{ exams.length }}
+          </p>
+          <button
+            class="btn btn-danger"
+            (click)="deleteSubject()"
+          >
+            <i class="bi bi-trash"></i> Remove
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+}

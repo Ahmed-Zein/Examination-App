@@ -1,0 +1,22 @@
+@if (isLoading) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="card p-4 m-2 border border-1 rounded-4 justify-content-between overflow-auto" style="min-height: 90%">
+    <app-exam-results-table [examResults]="examResults"></app-exam-results-table>
+    <div class="container-fluid mt-4 align-items-center ">
+      <div class="d-inline-block mx-2">
+        <label for="pageSize" class="form-label text-muted">Items per page</label>
+        <input class="form-control form-control-sm" id="pageSize" type="number" [(ngModel)]="pageSize"
+               (change)="paginationHandler(page)" style="width: 100px;">
+      </div>
+      <ngb-pagination
+        class="d-inline-block"
+        (pageChange)="paginationHandler($event)"
+        [pageSize]="pagination.pageSize"
+        [collectionSize]="pagination.totalCount"
+        [(page)]="page"
+        aria-label="Default pagination">
+      </ngb-pagination>
+    </div>
+  </div>
+}

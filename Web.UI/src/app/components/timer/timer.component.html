@@ -1,0 +1,6 @@
+<div class=" text-dark m-2">
+  <span class="time">{{ hours | number: '2.0' }}</span> :
+  <span class="time">{{ minutes | number: '2.0' }}</span> :
+  <span class="time">{{ seconds | number: '2.0' }}</span>
+</div>
+<p-progressbar [value]="barValue | number: '2.0'"></p-progressbar>

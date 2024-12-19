@@ -1,0 +1,41 @@
+@if (isLoading) {
+  <div>
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+} @else {
+  <div class="container mt-5">
+    <h1 class="text-center text-black">{{ studentExam.modelName }}</h1>
+    <p class="text-center text-muted">Duration: {{ studentExam.duration }} minutes</p>
+    <!-- TODO: Display timer with the duration -->
+    <app-timer (Completed)="submitSolution()" [totalSeconds]="examTimeInSeconds()"></app-timer>
+
+    <form [formGroup]="examinationForm" class="my-4">
+      <div formArrayName="answers">
+        @for (question of studentExam.questions; let i = $index; track question.id) {
+          <div [formGroupName]="i" class="mb-4">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title text-dark">Q{{ i + 1 }}. {{ studentExam.questions[i].text }}</h5>
+                @for (answer of question.answers; track answer.id) {
+                  <div class="form-check m-2">
+                    <input type="radio" [id]="'answer-' + i + '-' + answer.id" [value]="answer.id"
+                           formControlName="answerId" class="form-check-input"/>
+                    <label class="form-check-label text-dark-emphasis" [for]="'answer-' + i + '-' + answer.id">
+                      {{ answer.text }}
+                    </label>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="m-4">
+        <button type="submit" class="btn btn-dark m-4 d-block" [disabled]="!examinationForm.valid"
+                (click)="onExamFinished()">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+}

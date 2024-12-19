@@ -1,0 +1,62 @@
+.dashboard {
+  padding: 20px;
+}
+
+.dashboard-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333; /* Dark gray */
+}
+
+/* Card Styles */
+.stat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #fff; /* White cards */
+  color: #333; /* Dark gray text */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Elevate on hover */
+}
+
+/* Icon Styling */
+.stat-card .icon {
+  font-size: 2.5rem;
+  color: #555; /* Medium gray */
+  margin-right: 15px;
+}
+
+/* Details Section */
+.stat-card .details h3 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #333; /* Dark gray */
+}
+
+.stat-card .details p {
+  margin: 0;
+  font-size: 1rem;
+  color: #777; /* Lighter gray */
+}
+
+/* Responsive Grid */
+@media (max-width: 768px) {
+  .stat-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .stat-card .icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}

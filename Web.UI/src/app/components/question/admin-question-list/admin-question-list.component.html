@@ -1,0 +1,23 @@
+@for (question of this.questions; track question.id) {
+  <div class="m-1" ngbAccordion>
+    <div ngbAccordionItem>
+      <h3 ngbAccordionHeader>
+        <button ngbAccordionButton>{{ question.text }}</button>
+      </h3>
+      <div ngbAccordionCollapse>
+        @for (ans of question.answers; track ans.id) {
+          <div ngbAccordionBody>
+            <ng-template>
+              @if (ans.isCorrect) {
+                <i class="bi bi-check-circle-fill" style="color: teal"></i>
+              } @else {
+                <i class="bi bi-circle" style="color: teal;"></i>
+              }
+              {{ ans.text }}
+            </ng-template>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

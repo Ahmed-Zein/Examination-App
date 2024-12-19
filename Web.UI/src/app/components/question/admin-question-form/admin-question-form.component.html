@@ -1,0 +1,62 @@
+<div class="container my-4 border-2 border border-secondary-subtle p-4 rounded-2">
+  <h3>Add Question</h3>
+  <hr>
+  <form (ngSubmit)="submitForm()">
+    <div class="mb-3">
+      <label class="form-label" for="questionText">Question</label>
+      <textarea [(ngModel)]="currentQuestion.text" class="form-control" id="questionText" name="questionText"
+                placeholder="Enter question" required rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <h5>Answers</h5>
+      @for (answer of currentQuestion.answers; let i = $index; track i) {
+        <div class="mb-2 d-flex align-items-center">
+          <input [(ngModel)]="answer.text" [name]="'answerText' + i" class="form-control me-2"
+                 placeholder="Enter answer" required type="text"/>
+          <input [(ngModel)]="answer.isCorrect" [name]="'answerCorrect' + i" class="form-check-input me-2"
+                 type="checkbox"/>
+          <button (click)="removeAnswer(i)" class="btn btn-danger btn-sm" type="button">
+            Remove
+          </button>
+        </div>
+      }
+    </div>
+
+    <button (click)="addAnswer()" class="btn btn-success btn-sm mb-3" type="button">Add Answer</button>
+
+    <div class="d-flex justify-content-between">
+      <button (click)="addQuestion()" class="btn btn-secondary" type="button">Add Question</button>
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+  </form>
+
+  <hr/>
+
+  <h5>Questions Preview</h5>
+  <ul class="list-group">
+    @for (question of questions; let i = $index; track question) {
+      <li class="list-group-item">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Q{{ i + 1 }}:</strong> {{ question.text }}
+          </div>
+          <div (click)="popFromPreview(i)" class="cursor-pointer" aria-label="Delete question">
+            <i class="bi bi-trash text-danger"></i>
+          </div>
+        </div>
+        <ul class="mt-2">
+          @for (answer of question.answers; track answer) {
+            <li>
+              {{ answer.text }}
+              @if (answer.isCorrect) {
+                <span class="text-success">(Correct)</span>
+              }
+            </li>
+          }
+        </ul>
+      </li>
+
+    }
+  </ul>
+</div>

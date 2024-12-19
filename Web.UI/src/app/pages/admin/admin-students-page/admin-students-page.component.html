@@ -1,0 +1,59 @@
+@if (isLoading) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="card p-4 m-2 border border-1 rounded-4 justify-content-between overflow-auto" style="min-height: 90%">
+    <table class="table table-hover align-middle">
+      <thead class="table">
+      <tr>
+        <th scope="col" class="text-start">Name</th>
+        <th scope="col" class="text-center">Status</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (student of studentsList; track student.id) {
+          <tr (click)="viewStudentPage(student.id)">
+            <!-- Name and Email -->
+            <td class="text-start">
+              <div class="d-flex flex-column">
+                <span class="fw-medium h5 m-0">{{ student.firstName + ' ' + student.lastName }}</span>
+                <small class="text-muted">{{ student.email }}</small>
+              </div>
+            </td>
+            <td class="text-center">
+            <span
+              class="badge rounded-pill px-3 py-2"
+              [style.background-color]="student.isLocked ? '#fdecea' : '#e6f4ea'"
+              [style.color]="student.isLocked ? '#d9534f' : '#4caf50'">
+              {{ student.isLocked ? 'Locked' : 'Allowed' }}
+            </span>
+            </td>
+            <!-- Actions -->
+            <td class="text-center ">
+              <button class="btn btn-sm" [class]="student.isLocked ? 'btn-danger' : 'btn-warning'"
+                      (click)="changeStudentLock(student); $event.stopPropagation()">
+                <i class="bi" [class]="student.isLocked ? 'bi-lock-fill' : 'bi-unlock-fill'"></i>
+                <span class="visually-hidden">{{ student.isLocked ? 'Unlock Student' : 'Lock Student' }}</span>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="container-fluid mt-4 align-items-center">
+      <div class="d-inline-block mx-2">
+        <label for="pageSize" class="form-label text-muted">Items per page</label>
+        <input class="form-control form-control-sm" id="pageSize" type="number" [(ngModel)]="pageSize"
+               (change)="paginationHandler(pagination.page)" style="width: 100px;">
+      </div>
+      <ngb-pagination
+        class="d-inline-block"
+        (pageChange)="paginationHandler($event)"
+        [pageSize]="pagination.pageSize"
+        [collectionSize]="pagination.totalCount"
+        [(page)]="page"
+        aria-label="Default pagination">
+      </ngb-pagination>
+    </div>
+  </div>
+}

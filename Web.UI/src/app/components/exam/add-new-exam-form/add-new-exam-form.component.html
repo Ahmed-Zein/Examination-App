@@ -1,0 +1,68 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="formCtrl" class="card p-2 mb-3 border-2 p-4">
+  <div class="mb-3">
+    <h3>Add Exam</h3>
+    <hr/>
+    <label class="form-label" for="modelName">Model Name</label>
+    <input [class.is-invalid]="
+        formCtrl.get('modelName')?.touched && formCtrl.get('modelName')?.invalid
+      " class="form-control" formControlName="modelName" id="modelName" type="text"/>
+
+    @if (formCtrl.get('modelName')?.touched &&
+    formCtrl.get('modelName')?.invalid) {
+      <div class="invalid-feedback">
+        @if (formCtrl.get('modelName')?.errors?.['required']) {
+
+          <small>Model Name is required.</small>
+        }
+        @if (formCtrl.get('modelName')?.errors?.['minlength']) {
+
+          <small>Model Name must be at least 3 characters long.</small>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" for="hours">Hours</label>
+    <input [class.is-invalid]="
+        formCtrl.get('hours')?.touched && formCtrl.get('hours')?.invalid
+      " class="form-control" formControlName="hours" id="hours" type="number"/>
+    @if (formCtrl.get('hours')?.touched && formCtrl.get('hours')?.invalid) {
+      <div class="invalid-feedback">
+        @if (formCtrl.get('hours')?.errors?.['required']) {
+          <small>Hours are required.</small>
+        }
+        @if (formCtrl.get('hours')?.errors?.['min'] ||
+        formCtrl.get('hours')?.errors?.['max']) {
+          <small> Hours must be between 0 and 4. </small>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" for="minutes">Minutes</label>
+    <input [class.is-invalid]="
+        formCtrl.get('minutes')?.touched && formCtrl.get('minutes')?.invalid
+      " class="form-control" formControlName="minutes" id="minutes" type="number"/>
+    @if (formCtrl.get('minutes')?.touched && formCtrl.get('minutes')?.invalid) {
+      <div class="invalid-feedback">
+        @if (formCtrl.get('minutes')?.errors?.['required']) {
+          <small>Minutes are required.</small>
+        }
+        @if (formCtrl.get('minutes')?.errors?.['min'] ||
+        formCtrl.get('minutes')?.errors?.['max']) {
+          <small> Minutes must be between 0 and 59. </small>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="d-grid">
+    <button [disabled]="formCtrl.invalid || isSubmitting" class="btn btn-primary" type="submit">
+      @if (isSubmitting) {
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+      } Create
+    </button>
+  </div>
+</form>

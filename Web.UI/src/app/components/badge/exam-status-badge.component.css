@@ -1,0 +1,4 @@
+.text-fit {
+  display: inline-block; /* Shrinks to fit content */
+  white-space: nowrap; /* Prevents wrapping */
+}

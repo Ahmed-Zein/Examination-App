@@ -1,0 +1,16 @@
+.form-check:hover {
+  background-color: #f1f8ff;
+  transition: background-color 0.3s ease;
+}
+
+button[disabled] {
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
+  color: #a1a1a1;
+  cursor: not-allowed;
+}
+
+button:not([disabled]):hover {
+  /*background-color: #084298;*/
+  transition: background-color 0.3s ease;
+}

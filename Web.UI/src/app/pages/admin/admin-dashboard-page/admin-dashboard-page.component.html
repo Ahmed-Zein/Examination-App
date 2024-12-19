@@ -1,0 +1,26 @@
+@if (isLoading) {
+  <app-loading-spinner></app-loading-spinner>
+} @else {
+  <div class="container-fluid dashboard mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="dashboard-title">Admin Dashboard</h2>
+    </div>
+
+    <!-- Cards Section -->
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <app-dashboard-item-card [number]="dashboardData.totalStudents"
+                                 [title]="'Total Students'"></app-dashboard-item-card>
+      </div>
+
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <app-dashboard-item-card [number]="dashboardData.totalSubjects"
+                                 [title]="'Total Subjects'"></app-dashboard-item-card>
+      </div>
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <app-dashboard-item-card [number]="dashboardData.totalExamsTaken"
+                                 [title]="'Total Exams Taken'"></app-dashboard-item-card>
+      </div>
+    </div>
+  </div>
+}

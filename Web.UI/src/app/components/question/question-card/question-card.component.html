@@ -1,0 +1,29 @@
+<div class="p-2 rounded"
+     style="background-color: #eef2fa; border-left: 5px solid #0d6efd; display: flex; align-items: center;">
+  @if (showDeleteBtn) {
+    <!-- Button before the question card -->
+    <button class="btn btn-outline-danger p-2 m-1 border-0" (click)="onDelete()">
+      <i class="bi bi-trash fs-5"></i>
+    </button>
+  }
+  <!-- Question card -->
+  <div class="form-check mb-2 p-3 rounded" style="background-color: white; border: 1px solid #d9e2f1; flex-grow: 1;">
+    <label class="form-check-label fw-semibold text-primary" for="question-{{ question.id }}" style="font-size: 1rem;">
+      {{ question.text }}
+    </label>
+
+    <ng-content></ng-content>
+    <!-- Answers Section -->
+    <div class="ms-4 mt-2 small">
+      @for (ans of question.answers; track ans.id) {
+        <div class="d-flex align-items-center my-2">
+          <i class="bi"
+             [ngClass]="iconClassList(ans)"
+             style="font-size: 0.9rem; margin-right: 5px;"
+          ></i>
+          <span>{{ ans.text }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

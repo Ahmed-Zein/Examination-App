@@ -1,0 +1,10 @@
+<div class="d-flex bg-light vh-100">
+  <p-toast></p-toast>
+  <app-drawer (logout)="Logout()" [drawerActions]="GetActions"></app-drawer>
+
+  <div class="app-container flex-grow-1 m-2 rounded rounded-4" style="overflow-x: hidden;">
+    <div class="p-2 rounded bg-light-subtle rounded-4" style="height: 100% ">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
