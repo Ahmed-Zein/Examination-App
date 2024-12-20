@@ -1,4 +1,4 @@
-namespace Application.Models;
+namespace Core.Models;
 
 public class PaginationQuery
 {

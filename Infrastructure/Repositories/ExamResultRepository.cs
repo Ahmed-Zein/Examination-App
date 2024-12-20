@@ -1,7 +1,8 @@
+using System.Linq.Expressions;
 using Application.Interfaces.Persistence;
-using Application.Models;
 using Core.Constants;
 using Core.Entities;
+using Core.Models;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,18 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
         return context.ExamResults.AnyAsync(e => e.Id == id);
     }
 
-    public Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery query)
+    public Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery query, SortingQuery sortingQuery)
     {
         var examResultsQuery = context.ExamResults
             .Include(e => e.AppUser)
-            .OrderByDescending(e=>e.StartTime)
             .AsNoTracking();
+        examResultsQuery = sortingQuery.Ascending ?? true
+            ? examResultsQuery.OrderBy(GetSortingProperty(sortingQuery))
+            : examResultsQuery.OrderByDescending(GetSortingProperty(sortingQuery));
 
         return PagedData<ExamResult>.CreateAsync(examResultsQuery, query);
     }
+
 
     public async Task<List<ExamResult>> GetAllAsync()
     {
@@ -36,7 +40,7 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
     {
         var examQuery = context.ExamResults
             .Where(e => e.AppUserId == studentId)
-            .OrderByDescending(e=>e.StartTime)
+            .OrderByDescending(e => e.StartTime)
             .AsNoTracking();
 
         return Result.Ok(await PagedData<ExamResult>.CreateAsync(examQuery, pagination));
@@ -81,5 +85,16 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
         if (examResult.StartTime + examDuration < toUpdate.EndTime) examResult.StudentScore = toUpdate.StudentScore;
 
         return Result.Ok(examResult);
+    }
+
+    private static Expression<Func<ExamResult, object>> GetSortingProperty(SortingQuery sortingQuery)
+    {
+        return sortingQuery.OrderBy?.ToLower() switch
+        {
+            "endtime" => examResult => examResult.EndTime ?? new DateTime(),
+            "studentscore" => examResult => examResult.StudentScore,
+            "status" => examResult => examResult.Status,
+            _ => examResult => examResult.StartTime,
+        };
     }
 }

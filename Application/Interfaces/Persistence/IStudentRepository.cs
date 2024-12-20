@@ -1,5 +1,6 @@
 using Application.Models;
 using Core.Entities;
+using Core.Models;
 using FluentResults;
 
 namespace Application.Interfaces.Persistence;

@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Persistence;
 using Application.Models;
 using AutoMapper;
+using Core.Models;
 using FluentResults;
 
 namespace Application.Services;
@@ -22,9 +23,9 @@ public class ExamResultService(IUnitOfWork unitOfWork, IMapper mapper) : IExamRe
         return Result.Ok(examResults);
     }
 
-    public async Task<PagedData<ExamResultDto>> GetAllExamResults(PaginationQuery pagination)
+    public async Task<PagedData<ExamResultDto>> GetAllExamResults(PaginationQuery pagination, SortingQuery sorting)
     {
-        var examResults = await _examResultRepository.GetAllAsync(pagination);
+        var examResults = await _examResultRepository.GetAllAsync(pagination, sorting);
         return mapper.Map<PagedData<ExamResultDto>>(examResults);
     }
 }

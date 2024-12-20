@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Models;
+namespace Core.Models;
 
 public class PagedData<T>
 {

@@ -4,6 +4,7 @@ using AutoMapper;
 using AutoMapper.Internal;
 using Core.Entities;
 using Core.Enums;
+using Core.Models;
 
 namespace Application.Mappers;
 

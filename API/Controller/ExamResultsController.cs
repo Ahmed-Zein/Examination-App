@@ -1,8 +1,8 @@
 using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
-using Application.Models;
 using Core.Constants;
+using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +15,10 @@ public class ExamResultsController(IExamResultService examResultService) : Contr
 {
     [HttpGet("results")]
     [Authorize(Roles = AuthRolesConstants.Admin)]
-    public async Task<ActionResult<JsonResponse<PagedData<ExamResultDto>>>> GetAll([FromQuery] PaginationQuery query)
+    public async Task<ActionResult<JsonResponse<PagedData<ExamResultDto>>>> GetAll([FromQuery] PaginationQuery query,
+        [FromQuery] SortingQuery sorting)
     {
-        var examResults = await examResultService.GetAllExamResults(query);
+        var examResults = await examResultService.GetAllExamResults(query, sorting);
         return Ok(JsonResponse<PagedData<ExamResultDto>>.Ok(examResults));
     }
 

@@ -3,6 +3,7 @@ using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
 using Core.Constants;
+using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

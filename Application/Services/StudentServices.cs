@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Persistence;
 using Application.Models;
 using AutoMapper;
+using Core.Models;
 using FluentResults;
 
 namespace Application.Services;

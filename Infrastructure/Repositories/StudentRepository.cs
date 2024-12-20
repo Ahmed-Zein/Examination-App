@@ -2,6 +2,7 @@ using Application.Interfaces.Persistence;
 using Application.Models;
 using Core.Constants;
 using Core.Entities;
+using Core.Models;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
