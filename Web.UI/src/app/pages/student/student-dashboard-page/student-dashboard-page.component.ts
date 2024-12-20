@@ -5,15 +5,8 @@ import {StudentDashboard} from '../../../core/models/student.dashboard';
 import {Subscription} from 'rxjs';
 import {LoadingSpinnerComponent} from '../../../components/shared/loading-spinner/loading-spinner.component';
 import {HttpErrorResponse} from '@angular/common/http';
-import {
-  DashboardItemCardComponent
-} from '../../admin/admin-dashboard-page/dashboard-item-card/dashboard-item-card.component';
-
-enum PageState {
-  init,
-  Error,
-  Loaded
-}
+import {DashboardItemCardComponent} from '../../../components/dashboard-item-card/dashboard-item-card.component';
+import {PageState} from '../../../core/models/page.status';
 
 @Component({
   selector: 'app-student-dashboard-page',

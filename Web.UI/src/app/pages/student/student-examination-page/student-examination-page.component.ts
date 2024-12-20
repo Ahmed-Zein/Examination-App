@@ -1,33 +1,36 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
-import {LoadingSpinnerComponent} from "../../../components/shared/loading-spinner/loading-spinner.component";
 import {ExamSolution, StudentExam} from "../../../core/models/exam.model";
 import {ExamService} from "../../../core/services/exam.services";
+import {Subscription} from 'rxjs';
+import {PageState} from '../../../core/models/page.status';
+import {JsonResponse} from '../../../core/models/jsonResponse';
+import {PageStateHandlerComponent} from '../../../components/page-state-handler/page-state-handler.component';
 import {TimerComponent} from '../../../components/timer/timer.component';
-import {NotificationService} from '../../../core/services/notification.service';
 
 
 @Component({
   selector: 'app-student-examination-page',
   standalone: true,
-  imports: [LoadingSpinnerComponent, ReactiveFormsModule, TimerComponent],
+  imports: [ReactiveFormsModule, PageStateHandlerComponent, TimerComponent],
   templateUrl: './student-examination-page.component.html',
   styleUrl: './student-examination-page.component.css',
 })
-export class StudentExaminationPageComponent implements OnInit {
-  isLoading = true;
+export class StudentExaminationPageComponent implements OnInit, OnDestroy {
+  pageState = PageState.init;
   studentExam!: StudentExam;
-  examinationForm: FormGroup
+  examinationForm: FormGroup;
+  examSubscription!: Subscription;
   subjectId!: string;
+  error: JsonResponse<any> | undefined;
+  protected readonly PageState = PageState;
 
   constructor(
-    private examService: ExamService,
-    private notficationService: NotificationService,
-    private activatedRoute: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
-  ) {
+    private fb: FormBuilder,
+    private examService: ExamService,
+    private activatedRoute: ActivatedRoute) {
     this.examinationForm = this.fb.group({
       answers: this.fb.array([], Validators.required),
     });
@@ -35,6 +38,10 @@ export class StudentExaminationPageComponent implements OnInit {
 
   get answersArray(): FormArray {
     return this.examinationForm.get('answers') as FormArray;
+  }
+
+  ngOnDestroy(): void {
+    this.examSubscription.unsubscribe();
   }
 
   examTimeInSeconds() {
@@ -46,10 +53,9 @@ export class StudentExaminationPageComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((params) => {
       this.subjectId = params['subjectId'];
-      this.fetchExam(this.subjectId);
-    });
+      this.load()
+    })
   }
-
 
   onExamFinished(): void {
     if (!this.examinationForm.valid) {
@@ -64,7 +70,6 @@ export class StudentExaminationPageComponent implements OnInit {
       solutions: this.examinationForm.value.answers
     };
     examSolution.solutions = examSolution.solutions.filter(solution => solution.answerId != null) ?? [];
-    console.log(examSolution);
     this.examService.SendStudentSolutions(this.subjectId, this.studentExam.id.toString(), examSolution)
       .subscribe({
         next: (result) => {
@@ -76,16 +81,27 @@ export class StudentExaminationPageComponent implements OnInit {
       })
   }
 
-  private fetchExam(subjectId: string): void {
-    this.examService.StartStudentExam(subjectId).subscribe({
+  load() {
+    this.pageState = PageState.init;
+    this.examSubscription = this.fetchExam();
+  }
+
+  protected fetchExam(): Subscription {
+    return this.examService.StartStudentExam(this.subjectId).subscribe({
       next: (examData) => {
-        this.setupExam(examData);
+        this.setupExamForm(examData);
+        this.pageState = PageState.Loaded;
       },
-      error: () => (this.isLoading = false),
+      error: (error) => {
+        this.error = error.error;
+        this.pageState = PageState.Error;
+        console.log(error.error);
+      }, complete: () => {
+      }
     });
   }
 
-  private setupExam(examData: StudentExam): void {
+  private setupExamForm(examData: StudentExam): void {
     this.studentExam = examData;
     this.studentExam.questions.forEach((question) => {
       const questionFormGroup = this.fb.group({
@@ -94,6 +110,5 @@ export class StudentExaminationPageComponent implements OnInit {
       });
       this.answersArray.push(questionFormGroup);
     });
-    this.isLoading = false;
   }
 }

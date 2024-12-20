@@ -1,0 +1,11 @@
+@if (pageState === PageState.init) {
+  <app-loading-spinner></app-loading-spinner>
+} @else if (pageState === PageState.Error) {
+  <app-error-display
+    [message]="details"
+    [title]="title"
+    (retry)="onRetry()">
+  </app-error-display>
+} @else {
+  <ng-content></ng-content>
+}

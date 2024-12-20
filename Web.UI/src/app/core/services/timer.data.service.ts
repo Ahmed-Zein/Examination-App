@@ -13,6 +13,4 @@ export class TimerDataService {
   public Observable() {
     return this.timerSubject.asObservable();
   }
-
-
 }

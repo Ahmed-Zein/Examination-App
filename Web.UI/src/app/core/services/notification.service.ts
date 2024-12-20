@@ -10,16 +10,21 @@ export class NotificationService {
   connection!: HubConnection;
 
   constructor(private configuration: Configuration, private authService: AuthService) {
-    this.establishConnection().then(connection => {
-      console.log("New Connection" + connection);
-    })
   }
 
   get Connection(): HubConnection {
     return this.connection;
   }
 
-  private async establishConnection() {
+  public OnReceiveNotification(fc: (data: string, level: number) => void): void {
+    this.connection.on("ReceiveNotification", fc)
+  }
+
+  public DestroyOnReceiveNotification(fc: (data: string, level: number) => void): void {
+    this.connection.off("ReceiveNotification", fc)
+  }
+
+  public async establishConnection() {
     const jwtToken = this.authService.GetAuthToken();
 
     this.connection = new signalR.HubConnectionBuilder()
@@ -35,4 +40,25 @@ export class NotificationService {
     await this.connection.start();
     return
   }
+
+  private _severity(number: number) {
+    switch (number) {
+      case 0:
+        return 'info';
+      case 1:
+        return 'success';
+      case 2:
+        return 'warn';
+      default:
+        return 'error';
+    }
+  }
+
+//   this.connection.on("ReceiveNotification", (data: string, level: number) => {
+//   this.messageService.add({
+//                             severity: this._severity(level),
+//   summary: 'Notification Received',
+//   detail: data,
+// });
+// });
 }

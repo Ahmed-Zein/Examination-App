@@ -39,7 +39,9 @@ export class ExamService {
   public StartStudentExam(subjectId: string) {
     return this.http
       .get<JsonResponse<StudentExam>>(`/subjects/${subjectId}/exams/start`)
-      .pipe(map((res) => res.data!));
+      .pipe(
+        map((res: JsonResponse<StudentExam>) => res.data!),
+      );
   }
 
   public SendStudentSolutions(subjectId: string, examId: string, examSolution: ExamSolution) {

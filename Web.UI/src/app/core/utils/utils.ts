@@ -12,4 +12,17 @@ export class Utils {
     const utcDate = new Date(date);
     return new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
   }
+
+  public static severity(number: number) {
+    switch (number) {
+      case 0:
+        return 'info';
+      case 1:
+        return 'success';
+      case 2:
+        return 'warn';
+      default:
+        return 'error';
+    }
+  }
 }

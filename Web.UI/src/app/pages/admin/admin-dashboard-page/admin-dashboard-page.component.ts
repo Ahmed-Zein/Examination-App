@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AdminServices, DashboardData} from '../../../core/services/admin.services';
 import {HttpErrorResponse} from '@angular/common/http';
 import {LoadingSpinnerComponent} from '../../../components/shared/loading-spinner/loading-spinner.component';
-import {DashboardItemCardComponent} from './dashboard-item-card/dashboard-item-card.component';
+import {DashboardItemCardComponent} from '../../../components/dashboard-item-card/dashboard-item-card.component';
 
 @Component({
   selector: 'app-admin-dashboard-page',

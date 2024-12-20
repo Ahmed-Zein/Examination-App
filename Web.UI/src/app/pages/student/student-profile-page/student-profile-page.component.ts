@@ -1,7 +1,6 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../../../core/services/auth.service';
 import {Student} from '../../../core/models/student.model';
-import {LoadingSpinnerComponent} from '../../../components/shared/loading-spinner/loading-spinner.component';
 import {StudentsService} from '../../../core/services/students.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
@@ -9,27 +8,30 @@ import {ExamResultsTableComponent} from '../../../components/exam-results-table/
 import {AppRoles} from '../../../core/config/configuration';
 import {ActivatedRoute} from '@angular/router';
 import {NotificationService} from '../../../core/services/notification.service';
-import {HubConnection} from '@microsoft/signalr';
+import {PageState} from '../../../core/models/page.status';
+import {PageStateHandlerComponent} from '../../../components/page-state-handler/page-state-handler.component';
+import {JsonResponse} from '../../../core/models/jsonResponse';
 
 @Component({
   selector: 'app-student-profile-page',
   standalone: true,
   imports: [
-    LoadingSpinnerComponent,
     FormsModule,
-    ExamResultsTableComponent
+    ExamResultsTableComponent,
+    PageStateHandlerComponent
   ],
   templateUrl: './student-profile-page.component.html',
   styleUrl: './student-profile-page.component.css'
 })
 export class StudentProfilePageComponent implements OnInit, OnDestroy {
   @Input() student!: Student;
-  isLoading = true;
+  pageState: PageState = PageState.init;
+  error?: JsonResponse<any>;
   editing = false;
   studentId!: string;
-  signalConnections!: HubConnection;
   signalAction: any;
   protected readonly AppRoles = AppRoles;
+  protected readonly PageState = PageState;
 
   constructor(private authService: AuthService,
               private notificationService: NotificationService,
@@ -41,23 +43,11 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.signalConnections) {
-      this.signalConnections.off("ReceiveNotification", this.signalAction);
-    }
+    this.notificationService.DestroyOnReceiveNotification(this.signalAction);
   }
 
   ngOnInit() {
-    if (this.authService.UserRole() === AppRoles.Admin) {
-      this.handleAdminRole()
-
-    } else {
-      this.handleStudentRole()
-      this.signalAction = (data: string, level: number) => {
-        this.loadStudent(this.studentId);
-      }
-      this.signalConnections = this.notificationService.Connection;
-      this.signalConnections.on("ReceiveNotification", this.signalAction);
-    }
+    this.load()
   }
 
   handleAdminRole() {
@@ -76,11 +66,11 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
     this.studentService.GetStudent(studentId).subscribe({
       next: (data: Student) => {
         this.student = data;
-        this.isLoading = false;
+        this.pageState = PageState.Loaded;
       },
       error: (error: HttpErrorResponse) => {
-        this.isLoading = false;
-        console.error(error);
+        this.pageState = PageState.Error;
+        this.error = error.error;
       },
     })
   }
@@ -88,5 +78,19 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
   toggleEdit() {
     this.editing = !this.editing;
     // TODO: impl user first/last name update
+  }
+
+  load() {
+    this.pageState = PageState.init;
+    if (this.authService.UserRole() === AppRoles.Admin) {
+      this.handleAdminRole()
+
+    } else {
+      this.handleStudentRole()
+      this.signalAction = (data: string, level: number) => {
+        this.loadStudent(this.studentId);
+      }
+      this.notificationService.OnReceiveNotification(this.signalAction);
+    }
   }
 }
