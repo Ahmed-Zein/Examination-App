@@ -4,32 +4,32 @@ import {AuthService} from './auth.service';
 import * as signalR from '@microsoft/signalr';
 import {HubConnection} from '@microsoft/signalr';
 
+
+class ClientHubAPI {
+  static receiveNotification = "ReceiveNotification"
+}
+
 @Injectable({providedIn: 'root'})
 export class NotificationService {
-
   connection!: HubConnection;
 
   constructor(private configuration: Configuration, private authService: AuthService) {
   }
 
-  get Connection(): HubConnection {
-    return this.connection;
-  }
-
   public OnReceiveNotification(fc: (data: string, level: number) => void): void {
-    this.connection.on("ReceiveNotification", fc)
+    this.connection.on(ClientHubAPI.receiveNotification, fc)
   }
 
   public DestroyOnReceiveNotification(fc: (data: string, level: number) => void): void {
     console.info("CALLED: DestroyOnReceiveNotification")
-    this.connection.off("ReceiveNotification", fc)
+    this.connection.off(ClientHubAPI.receiveNotification, fc)
   }
 
   public async establishConnection() {
     const jwtToken = this.authService.GetAuthToken();
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${this.configuration.BaseUrl}/notification`, {
+      .withUrl(this.configuration.SignalrUrl, {
         accessTokenFactory(): string | Promise<string> {
           return jwtToken;
         }
@@ -41,25 +41,4 @@ export class NotificationService {
     await this.connection.start();
     return
   }
-
-  private _severity(number: number) {
-    switch (number) {
-      case 0:
-        return 'info';
-      case 1:
-        return 'success';
-      case 2:
-        return 'warn';
-      default:
-        return 'error';
-    }
-  }
-
-//   this.connection.on("ReceiveNotification", (data: string, level: number) => {
-//   this.messageService.add({
-//                             severity: this._severity(level),
-//   summary: 'Notification Received',
-//   detail: data,
-// });
-// });
 }

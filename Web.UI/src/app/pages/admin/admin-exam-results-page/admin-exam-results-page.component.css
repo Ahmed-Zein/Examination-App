@@ -1,0 +1,13 @@
+th.sorted {
+  color: #007bff;
+  cursor: pointer;
+}
+
+th.sorted::after {
+  content: ' ▲';
+  display: inline-block;
+}
+
+th.sorted.desc::after {
+  content: ' ▼';
+}

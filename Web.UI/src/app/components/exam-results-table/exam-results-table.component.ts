@@ -18,8 +18,18 @@ import {Utils} from '../../core/utils/utils';
 })
 export class ExamResultsTableComponent {
   @Input({required: true}) examResults!: ExamResult[];
-  @Output() pageEmitter = new EventEmitter<number>();
-
-
+  @Output() orderChange = new EventEmitter<{ orderBy: string, asc: boolean }>();
+  sortedColumn: string = 'score';
+  ascending: boolean = false;
   protected readonly Utils = Utils;
+
+  onOrderChange(order: string): void {
+    if (this.sortedColumn === order) {
+      this.ascending = !this.ascending;
+    } else {
+      this.ascending = false
+      this.sortedColumn = order;
+    }
+    this.orderChange.emit({orderBy: order, asc: this.ascending})
+  }
 }

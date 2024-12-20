@@ -15,6 +15,11 @@ export default class Configuration {
     return `${this.BaseUrl}/api`;
   }
 
+  get SignalrUrl() {
+    const src = this.source[this.environment];
+    return `${this.BaseUrl}/notification`;
+  }
+
   get BaseUrl(): string {
     return `${this.source[this.environment].baseUrl}:${this.source[this.environment].port}`;
   }

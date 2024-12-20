@@ -2,10 +2,15 @@
   <thead>
   <tr>
     <th scope="col">student</th>
-    <th scope="col" class="text-center">Status</th>
-    <th scope="col">Start Time</th>
-    <th scope="col">End Time</th>
-    <th scope="col">Student Score</th>
+    <th scope="col" class="text-center"
+        [class.sorted]="sortedColumn==='status'"
+        (click)="onOrderChange('status')">Status
+    </th>
+    <th
+      scope="col" (click)="onOrderChange('startTime')">Start Time
+    </th>
+    <th scope="col" (click)="onOrderChange('endTime')">End Time</th>
+    <th scope="col" (click)="onOrderChange('studentScore')">Student Score</th>
   </tr>
   </thead>
   <tbody>
