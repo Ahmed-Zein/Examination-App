@@ -1,32 +1,32 @@
-@if (isLoading) {
-  <app-loading-spinner></app-loading-spinner>
-} @else {
-  <main class="p-4">
-    <div class="container-fluid d-flex justify-content-between align-items-center m-4">
-      <h3 class="text-black">Available Subjects</h3>
-    </div>
-    <div class="container">
-      <div class="row g-4">
-        @for (subject of this.subjects; track subject.name; let i = $index) {
-          <div class="col-sm-6 col-md-4 col-lg-3">
-            <div class="card border-opacity-25 text-center p-4 rounded-2 shadow-sm bg-white">
-              <img
-                class="icon mx-auto"
-                ngSrc="/book.svg"
-                alt="Book Icon"
-                height="80"
-                width="80"
-              />
-              <h5 class="m-3 text-dark-emphasis">{{ subject.name }}</h5>
-              <button
-                class="btn btn-outline-dark rounded-2"
-                (click)="goToExamPage(i)">
-                Start Exam
-              </button>
-            </div>
-          </div>
-        }
+<app-page-state-handler (retryAction)="load()" [error]="error" [pageState]="pageState">
+  @if (pageState === PageState.Loaded) {
+    <main class="p-4">
+      <div class="container-fluid d-flex justify-content-between align-items-center m-4">
+        <h3 class="text-black">Available Subjects</h3>
       </div>
-    </div>
-  </main>
-}
+      <div class="container">
+        <div class="row g-4">
+          @for (subject of this.subjects; track subject.name; let i = $index) {
+            <div class="col-sm-6 col-md-4 col-lg-3">
+              <div class="card border-opacity-25 text-center p-4 rounded-2 shadow-sm bg-white">
+                <img
+                  class="icon mx-auto"
+                  ngSrc="/book.svg"
+                  alt="Book Icon"
+                  height="80"
+                  width="80"
+                />
+                <h5 class="m-3 text-dark-emphasis">{{ subject.name }}</h5>
+                <button
+                  class="btn btn-outline-dark rounded-2"
+                  (click)="goToExamPage(i)">
+                  Start Exam
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </main>
+  }
+</app-page-state-handler>

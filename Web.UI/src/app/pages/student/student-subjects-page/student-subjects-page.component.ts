@@ -1,34 +1,47 @@
-import { NgOptimizedImage } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { LoadingSpinnerComponent } from "../../../components/shared/loading-spinner/loading-spinner.component";
-import { Subject } from '../../../core/models/subject.model';
-import { SubjectService } from '../../../core/services/subject.service';
+import {NgOptimizedImage} from '@angular/common';
+import {HttpErrorResponse} from '@angular/common/http';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {Subject} from '../../../core/models/subject.model';
+import {SubjectService} from '../../../core/services/subject.service';
+import {PageStateHandlerComponent} from '../../../components/page-state-handler/page-state-handler.component';
+import {PageState} from '../../../core/models/page.status';
+import {JsonResponse} from '../../../core/models/jsonResponse';
 
 @Component({
   selector: 'app-student-subjects-page',
   standalone: true,
-  imports: [NgOptimizedImage, LoadingSpinnerComponent],
+  imports: [NgOptimizedImage, PageStateHandlerComponent],
   templateUrl: './student-subjects-page.component.html',
   styleUrl: './student-subjects-page.component.css',
 })
 export class StudentSubjectsPageComponent implements OnInit {
-  isLoading= true;
+  pageState = PageState.init;
+  error?: JsonResponse<any>;
   subjects: Subject[] = [];
+  protected readonly PageState = PageState;
 
   constructor(
     private subjectService: SubjectService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
+    this.load();
+  }
+
+  load() {
+    this.pageState = PageState.init
     this.subjectService.GetAllSubjects().subscribe({
       next: (data: any) => {
         this.subjects = data;
-        this.isLoading=false;
+        this.pageState = PageState.Loaded
       },
-      error: (error: HttpErrorResponse) => console.error(error),
+      error: (error: HttpErrorResponse) => {
+        this.pageState = PageState.Error
+        this.error = error.error;
+      }
     });
   }
 

@@ -1,23 +1,22 @@
-@if (state == PageState.init) {
-  <app-loading-spinner></app-loading-spinner>
-} @else if (state == PageState.Error) {
-  <h1> An Error Occurred</h1>
-} @else {
-  <div class="container-fluid dashboard mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="dashboard-title">Welcome {{ dashboard.name }}</h2>
+<app-page-state-handler [error]="error" [pageState]="pageState"
+                        (retryAction)="load()">
+  @if (pageState == PageState.Loaded) {
+    <div class="container-fluid dashboard mt-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="dashboard-title">Welcome {{ dashboard.name }}</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6 col-sm-12">
+          <app-dashboard-item-card [number]="dashboard.totalExams" [title]="'Total Exams'"></app-dashboard-item-card>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+          <app-dashboard-item-card [number]="dashboard.totalExamsInEvaluation"
+                                   [title]="'Exams in Evaluation'"></app-dashboard-item-card>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+          <app-dashboard-item-card [number]="dashboard.passedExams" [title]="'Exam Passed'"></app-dashboard-item-card>
+        </div>
+      </div>
     </div>
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6 col-sm-12">
-        <app-dashboard-item-card [number]="dashboard.totalExams" [title]="'Total Exams'"></app-dashboard-item-card>
-      </div>
-      <div class="col-lg-4 col-md-6 col-sm-12">
-        <app-dashboard-item-card [number]="dashboard.totalExamsInEvaluation"
-                                 [title]="'Exams in Evaluation'"></app-dashboard-item-card>
-      </div>
-      <div class="col-lg-4 col-md-6 col-sm-12">
-        <app-dashboard-item-card [number]="dashboard.passedExams" [title]="'Exam Passed'"></app-dashboard-item-card>
-      </div>
-    </div>
-  </div>
-}
+  }
+</app-page-state-handler>
