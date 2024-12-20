@@ -3,7 +3,7 @@ import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from
 import {ActivatedRoute, Router} from "@angular/router";
 import {ExamSolution, StudentExam} from "../../../core/models/exam.model";
 import {ExamService} from "../../../core/services/exam.services";
-import {Subscription} from 'rxjs';
+import {Subject, Subscription, takeUntil} from 'rxjs';
 import {PageState} from '../../../core/models/page.status';
 import {JsonResponse} from '../../../core/models/jsonResponse';
 import {PageStateHandlerComponent} from '../../../components/page-state-handler/page-state-handler.component';
@@ -21,10 +21,10 @@ export class StudentExaminationPageComponent implements OnInit, OnDestroy {
   pageState = PageState.init;
   studentExam!: StudentExam;
   examinationForm: FormGroup;
-  examSubscription!: Subscription;
   subjectId!: string;
   error: JsonResponse<any> | undefined;
   protected readonly PageState = PageState;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -41,7 +41,8 @@ export class StudentExaminationPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.examSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   examTimeInSeconds() {
@@ -83,22 +84,24 @@ export class StudentExaminationPageComponent implements OnInit, OnDestroy {
 
   load() {
     this.pageState = PageState.init;
-    this.examSubscription = this.fetchExam();
+    this.fetchExam();
   }
 
   protected fetchExam(): Subscription {
-    return this.examService.StartStudentExam(this.subjectId).subscribe({
-      next: (examData) => {
-        this.setupExamForm(examData);
-        this.pageState = PageState.Loaded;
-      },
-      error: (error) => {
-        this.error = error.error;
-        this.pageState = PageState.Error;
-        console.log(error.error);
-      }, complete: () => {
-      }
-    });
+    return this.examService.StartStudentExam(this.subjectId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (examData) => {
+          this.setupExamForm(examData);
+          this.pageState = PageState.Loaded;
+        },
+        error: (error) => {
+          this.error = error.error;
+          this.pageState = PageState.Error;
+          console.log(error.error);
+        }, complete: () => {
+        }
+      });
   }
 
   private setupExamForm(examData: StudentExam): void {

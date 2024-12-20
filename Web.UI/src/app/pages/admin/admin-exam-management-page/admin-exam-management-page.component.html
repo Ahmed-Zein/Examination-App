@@ -1,145 +1,141 @@
-<main class="row">
-  <div class="col" style="border-right: gainsboro solid 1px;">
-    @if (isQuestionsLoading) {
-      <app-loading-spinner></app-loading-spinner>
-    } @else {
-      <div class="card p-4 border-0 rounded " style="background-color: transparent">
-        <form (ngSubmit)="onSubmit()" [formGroup]="formGroup">
-          <!-- Title Section -->
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h3 class="form-label fw-semibold text-black mb-2">Pick Exam Questions</h3>
-              <p
-                class="rounded px-2 py-1 small"
-                [style.background-color]="selectedQuestions.length <= 0 ? '#fdecea' : '#e6f4ea'"
-                [style.color]="selectedQuestions.length <= 0 ? '#d9534f' : '#4caf50'"
-              >
-                Selected {{ selectedQuestions.length }}
-                question{{ selectedQuestions.length !== 1 ? 's' : '' }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Questions Section -->
-          @for (fc of questionsFormArray.controls; track subjectQuestions.at(i)!.id; let i = $index) {
-            <div
-              class="p-3 rounded mb-4"
-              style="background-color: #eef2fa; border-left: 5px solid #0d6efd;"
-              formArrayName="questions"
-            >
-              <div
-                class="form-check mb-3 p-3 rounded"
-                style="background-color: white; border: 1px solid #d9e2f1;"
-              >
-                <input
-                  type="checkbox"
-                  [formControlName]="i"
-                  class="form-check-input me-2"
-                  id="question-{{ i }}"
-                />
-                <label
-                  class="form-check-label fw-semibold text-primary"
-                  for="question-{{ i }}"
-                  style="font-size: 1rem;"
+<app-page-state-handler
+  [error]="error" [pageState]="pageState">
+  @if (pageState == PageState.Loaded) {
+    <main class="row">
+      <div class="col" style="border-right: gainsboro solid 1px;">
+        <div class="card p-4 border-0 rounded " style="background-color: transparent">
+          <form (ngSubmit)="onSubmit()" [formGroup]="formGroup">
+            <!-- Title Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h3 class="form-label fw-semibold text-black mb-2">Pick Exam Questions</h3>
+                <p
+                  class="rounded px-2 py-1 small"
+                  [style.background-color]="selectedQuestions.length <= 0 ? '#fdecea' : '#e6f4ea'"
+                  [style.color]="selectedQuestions.length <= 0 ? '#d9534f' : '#4caf50'"
                 >
-                  {{ subjectQuestions[i].text }}
-                </label>
-
-                <!-- Answers Section -->
-                <div class="ms-4 mt-2 small">
-                  @for (ans of subjectQuestions[i].answers; track ans.id) {
-                    <div class="d-flex align-items-center my-2">
-                      <i
-                        class="bi"
-                        [ngClass]="ans.isCorrect ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"
-                        style="font-size: 0.9rem; margin-right: 5px;"
-                      ></i>
-                      <span>{{ ans.text }}</span>
-                    </div>
-                  }
-                </div>
+                  Selected {{ selectedQuestions.length }}
+                  question{{ selectedQuestions.length !== 1 ? 's' : '' }}
+                </p>
               </div>
             </div>
-          }
 
-          <!-- Submit Button -->
-          <div class="text-end">
-            <button
-              [disabled]="selectedQuestions.length === 0"
-              class="btn btn-outline-primary fw-medium"
-              type="submit"
-            >
-              <i class="bi bi-save me-2"></i>Update Questions
-            </button>
-          </div>
-        </form>
-      </div>
-    }
-  </div>
-  <div class="col-sm-12 col-md-6 col-lg-3 pt-1">
-    @if (isExamLoading) {
-      <app-loading-spinner></app-loading-spinner>
-    } @else {
-      <div class="container w-100 col-sm-12 col-md-6 col-lg-3 pt-1">
-        <div class="card p-2 mb-3 border-1 border-opacity-25 " style="background-color: #f4f4f9; color: #333;">
-          <div class="card-body">
-            <div class="d-flex justify-content-end align-items-end">
+            <!-- Questions Section -->
+            @for (fc of questionsFormArray.controls; track subjectQuestions.at(i)!.id; let i = $index) {
+              <div
+                class="p-3 rounded mb-4"
+                style="background-color: #eef2fa; border-left: 5px solid #0d6efd;"
+                formArrayName="questions"
+              >
+                <div
+                  class="form-check mb-3 p-3 rounded"
+                  style="background-color: white; border: 1px solid #d9e2f1;"
+                >
+                  <input
+                    type="checkbox"
+                    [formControlName]="i"
+                    class="form-check-input me-2"
+                    id="question-{{ i }}"
+                  />
+                  <label
+                    class="form-check-label fw-semibold text-primary"
+                    for="question-{{ i }}"
+                    style="font-size: 1rem;"
+                  >
+                    {{ subjectQuestions[i].text }}
+                  </label>
+
+                  <!-- Answers Section -->
+                  <div class="ms-4 mt-2 small">
+                    @for (ans of subjectQuestions[i].answers; track ans.id) {
+                      <div class="d-flex align-items-center my-2">
+                        <i
+                          class="bi"
+                          [ngClass]="ans.isCorrect ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"
+                          style="font-size: 0.9rem; margin-right: 5px;"
+                        ></i>
+                        <span>{{ ans.text }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Submit Button -->
+            <div class="text-end">
               <button
-                class="btn btn-outline-secondary btn-sm d-flex align-items-center"
-                (click)="toggleEdit()">
-                <i class="bi bi-pencil me-2"></i>
-                {{ editing ? 'Save' : 'Edit' }}
+                [disabled]="selectedQuestions.length === 0"
+                class="btn btn-outline-primary fw-medium"
+                type="submit"
+              >
+                <i class="bi bi-save me-2"></i>Update Questions
               </button>
             </div>
-
-            <div class="mb-3">
-              <label for="examModelName" class="form-label" style="color: #6c757d;">
-                <strong>Model Name</strong>
-              </label>
-              <input
-                id="examModelName"
-                type="text"
-                class="form-control"
-                [(ngModel)]="modelName"
-                [disabled]="!editing"
-                placeholder="Enter subject name"
-                style="background-color: #ffffff; border: 1px solid #ced4da; color: #333;"
-              />
-            </div>
-            <div class="form-group d-flex align-items-center">
-              <label for="hours" class="me-2">Duration:</label>
-              <input id="hours"
-                     [disabled]="!editing"
-                     [(ngModel)]="hours"
-                     class="form-control me-1" type="number" min="0" placeholder="hh" style="width: 70px;"/>
-              <span>:</span>
-              <input
-                id="minutes"
-                [disabled]="!editing"
-                class="form-control mx-1"
-                type="number"
-                [(ngModel)]="minutes"
-                min="0"
-                max="59"
-                placeholder="mm"
-                style="width: 70px;"
-              />
-            </div>
-
-            <p style="color: #495057;">
-              <strong># Questions:</strong> {{ exam.questions.length }}
-            </p>
-            <button
-              class="btn btn-danger"
-              (click)="deleteExam()"
-            >
-              <i class="bi bi-trash"></i> Remove
-            </button>
-          </div>
+          </form>
         </div>
-
       </div>
-    }
+      <div class="col-sm-12 col-md-6 col-lg-3 pt-1">
+        <div class="container w-100 col-sm-12 col-md-6 col-lg-3 pt-1">
+          <div class="card p-2 mb-3 border-1 border-opacity-25 " style="background-color: #f4f4f9; color: #333;">
+            <div class="card-body">
+              <div class="d-flex justify-content-end align-items-end">
+                <button
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+                  (click)="toggleEdit()">
+                  <i class="bi bi-pencil me-2"></i>
+                  {{ editing ? 'Save' : 'Edit' }}
+                </button>
+              </div>
 
-  </div>
-</main>
+              <div class="mb-3">
+                <label for="examModelName" class="form-label" style="color: #6c757d;">
+                  <strong>Model Name</strong>
+                </label>
+                <input
+                  id="examModelName"
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="modelName"
+                  [disabled]="!editing"
+                  placeholder="Enter subject name"
+                  style="background-color: #ffffff; border: 1px solid #ced4da; color: #333;"
+                />
+              </div>
+              <div class="form-group d-flex align-items-center">
+                <label for="hours" class="me-2">Duration:</label>
+                <input id="hours"
+                       [disabled]="!editing"
+                       [(ngModel)]="hours"
+                       class="form-control me-1" type="number" min="0" placeholder="hh" style="width: 70px;"/>
+                <span>:</span>
+                <input
+                  id="minutes"
+                  [disabled]="!editing"
+                  class="form-control mx-1"
+                  type="number"
+                  [(ngModel)]="minutes"
+                  min="0"
+                  max="59"
+                  placeholder="mm"
+                  style="width: 70px;"
+                />
+              </div>
+
+              <p style="color: #495057;">
+                <strong># Questions:</strong> {{ exam.questions.length }}
+              </p>
+              <button
+                class="btn btn-danger"
+                (click)="deleteExam()"
+              >
+                <i class="bi bi-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  }
+</app-page-state-handler>

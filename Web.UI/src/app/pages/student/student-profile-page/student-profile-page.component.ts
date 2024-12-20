@@ -11,6 +11,7 @@ import {NotificationService} from '../../../core/services/notification.service';
 import {PageState} from '../../../core/models/page.status';
 import {PageStateHandlerComponent} from '../../../components/page-state-handler/page-state-handler.component';
 import {JsonResponse} from '../../../core/models/jsonResponse';
+import {Subject, takeUntil} from 'rxjs';
 
 @Component({
   selector: 'app-student-profile-page',
@@ -29,9 +30,8 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
   error?: JsonResponse<any>;
   editing = false;
   studentId!: string;
-  signalAction: any;
-  protected readonly AppRoles = AppRoles;
   protected readonly PageState = PageState;
+  private destroy$ = new Subject<void>();
 
   constructor(private authService: AuthService,
               private notificationService: NotificationService,
@@ -42,8 +42,16 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
     return this.authService.UserRole() == AppRoles.Student
   }
 
+  get notificationAction() {
+    return (data: string, level: number) => {
+      this.loadStudent(this.studentId);
+    }
+  }
+
   ngOnDestroy(): void {
-    this.notificationService.DestroyOnReceiveNotification(this.signalAction);
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.notificationService.DestroyOnReceiveNotification(this.notificationAction);
   }
 
   ngOnInit() {
@@ -63,16 +71,18 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
   }
 
   loadStudent(studentId: string) {
-    this.studentService.GetStudent(studentId).subscribe({
-      next: (data: Student) => {
-        this.student = data;
-        this.pageState = PageState.Loaded;
-      },
-      error: (error: HttpErrorResponse) => {
-        this.pageState = PageState.Error;
-        this.error = error.error;
-      },
-    })
+    this.studentService.GetStudent(studentId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: Student) => {
+          this.student = data;
+          this.pageState = PageState.Loaded;
+        },
+        error: (error: HttpErrorResponse) => {
+          this.pageState = PageState.Error;
+          this.error = error.error;
+        },
+      })
   }
 
   toggleEdit() {
@@ -82,15 +92,11 @@ export class StudentProfilePageComponent implements OnInit, OnDestroy {
 
   load() {
     this.pageState = PageState.init;
+    this.notificationService.OnReceiveNotification(this.notificationAction);
     if (this.authService.UserRole() === AppRoles.Admin) {
       this.handleAdminRole()
-
     } else {
       this.handleStudentRole()
-      this.signalAction = (data: string, level: number) => {
-        this.loadStudent(this.studentId);
-      }
-      this.notificationService.OnReceiveNotification(this.signalAction);
     }
   }
 }

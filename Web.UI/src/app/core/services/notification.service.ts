@@ -21,6 +21,7 @@ export class NotificationService {
   }
 
   public DestroyOnReceiveNotification(fc: (data: string, level: number) => void): void {
+    console.info("CALLED: DestroyOnReceiveNotification")
     this.connection.off("ReceiveNotification", fc)
   }
 

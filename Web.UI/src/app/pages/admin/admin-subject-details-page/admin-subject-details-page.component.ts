@@ -1,6 +1,6 @@
 import {NgClass} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AddNewExamFormComponent} from '../../../components/exam/add-new-exam-form/add-new-exam-form.component';
 import {AdminExam} from '../../../core/models/exam.model';
@@ -13,6 +13,7 @@ import {QuestionFormComponent} from "../../../components/question/admin-question
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {QuestionCardComponent} from '../../../components/question/question-card/question-card.component';
 import {LoadingSpinnerComponent} from '../../../components/shared/loading-spinner/loading-spinner.component';
+import {Subject as RxSubject, takeUntil} from 'rxjs';
 
 @Component({
   selector: 'app-admin-subject-details-page',
@@ -21,7 +22,7 @@ import {LoadingSpinnerComponent} from '../../../components/shared/loading-spinne
   templateUrl: './admin-subject-details-page.component.html',
   styleUrl: './admin-subject-details-page.component.css',
 })
-export class AdminSubjectDetailsPageComponent implements OnInit {
+export class AdminSubjectDetailsPageComponent implements OnInit, OnDestroy {
   isSubjectLoading = true;
   isFirstTab = true;
   subject!: Subject;
@@ -29,6 +30,8 @@ export class AdminSubjectDetailsPageComponent implements OnInit {
   questions: AdminQuestion[] = [];
   exams: AdminExam[] = [];
   editing = false;
+  private destroy$ = new RxSubject<void>();
+
 
   constructor(
     private subjectService: SubjectService,
@@ -38,43 +41,57 @@ export class AdminSubjectDetailsPageComponent implements OnInit {
   ) {
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
+  }
+
   addExam(exam: AdminExam) {
-    this.examService.AddExamToSubject(this.subjectId!, exam).subscribe({
-      next: (_) => {
-        this.loadSubject();
-      },
-      error: (err) => {
-        console.log(err);
-      },
-    });
+    this.examService.AddExamToSubject(this.subjectId!, exam)
+
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (_) => {
+          this.loadSubject();
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
   }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      this.subjectId = params.get('subjectId');
-    });
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        this.subjectId = params.get('subjectId');
+      });
     this.loadSubject();
   }
 
   loadSubject() {
-    this.subjectService.GetSubjectById(this.subjectId ?? '0').subscribe({
-      next: (data: any) => {
-        this.subject = data;
-        this.questions = data.questions;
-        this.isSubjectLoading = false;
-        this.exams = data.exams;
-      },
-      error: (error: HttpErrorResponse) => console.error(error),
-    });
+    this.subjectService.GetSubjectById(this.subjectId ?? '0')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: any) => {
+          this.subject = data;
+          this.questions = data.questions;
+          this.isSubjectLoading = false;
+          this.exams = data.exams;
+        },
+        error: (error: HttpErrorResponse) => console.error(error),
+      });
   }
 
   onQuestionSubmit() {
-    this.subjectService.GetQuestionsBySubjectId(this.subjectId ?? '0').subscribe({
-      next: (data: any) => {
-        this.questions = data;
-      },
-      error: (error: HttpErrorResponse) => console.error(error),
-    });
+    this.subjectService.GetQuestionsBySubjectId(this.subjectId ?? '0')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: any) => {
+          this.questions = data;
+        },
+        error: (error: HttpErrorResponse) => console.error(error),
+      });
   }
 
   changeTab(isFirstTab: boolean) {
@@ -84,24 +101,31 @@ export class AdminSubjectDetailsPageComponent implements OnInit {
 
   toggleEdit() {
     if (this.editing) {
-      this.subjectService.UpdateSubjectName(this.subject.id.toString(), this.subject.name).subscribe({})
+      this.subjectService.UpdateSubjectName(this.subject.id.toString(), this.subject.name)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({})
     }
     this.editing = !this.editing;
   }
 
   deleteSubject() {
-    this.subjectService.DeleteSubject(this.subject.id.toString()).subscribe({
-      next: async () => {
-        await this.router.navigate(['/admin/dashboard']);
-      }
-    })
+    this.subjectService.DeleteSubject(this.subject.id.toString())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: async () => {
+          await this.router.navigate(['/admin/dashboard']);
+        }
+      })
   }
 
   deleteQuestion(question: AdminQuestion) {
-    this.subjectService.DeleteQuestion(this.subjectId!, question.id.toString()).subscribe({
-      next: () => {
-        this.loadSubject();
-      }
-    })
+    this.subjectService.DeleteQuestion(this.subjectId!, question.id.toString())
+
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loadSubject();
+        }
+      })
   }
 }

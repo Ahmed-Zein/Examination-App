@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../../../core/services/auth.service';
 import {StudentsService} from '../../../core/services/students.service';
 import {StudentDashboard} from '../../../core/models/student.dashboard';
-import {Subscription} from 'rxjs';
+import {Subject, takeUntil} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
 import {DashboardItemCardComponent} from '../../../components/dashboard-item-card/dashboard-item-card.component';
 import {PageState} from '../../../core/models/page.status';
@@ -24,7 +24,7 @@ export class StudentDashboardPageComponent implements OnInit, OnDestroy {
   dashboard!: StudentDashboard;
   error?: JsonResponse<any>
   protected readonly PageState = PageState;
-  private subscription!: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(private authService: AuthService, private studentService: StudentsService) {
   }
@@ -34,12 +34,14 @@ export class StudentDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   load() {
-    this.subscription =
-      this.studentService.GetStudentDashboard(this.authService.GetUserId()).subscribe({
+    this.studentService.GetStudentDashboard(this.authService.GetUserId())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (data: StudentDashboard) => {
           this.dashboard = data;
           console.log(data);

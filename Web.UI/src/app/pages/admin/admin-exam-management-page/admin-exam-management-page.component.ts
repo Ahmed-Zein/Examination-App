@@ -1,26 +1,27 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators,} from "@angular/forms";
 import {AdminExam} from '../../../core/models/exam.model';
 import {SubjectService} from '../../../core/services/subject.service';
 import {ExamService, UpdateExam} from '../../../core/services/exam.services';
 import {ActivatedRoute, Router} from '@angular/router';
-import {LoadingSpinnerComponent} from '../../../components/shared/loading-spinner/loading-spinner.component';
 import {AdminQuestion} from '../../../core/models/question.model';
-import {HttpErrorResponse} from '@angular/common/http';
 import {NgClass} from '@angular/common';
 import {Utils} from '../../../core/utils/utils';
+import {PageState} from '../../../core/models/page.status';
+import {forkJoin, Observable, Subject, switchMap, takeUntil} from 'rxjs';
+import {HttpErrorResponse} from '@angular/common/http';
+import {JsonResponse} from '../../../core/models/jsonResponse';
+import {PageStateHandlerComponent} from '../../../components/page-state-handler/page-state-handler.component';
 
 @Component({
   selector: 'app-admin-exam-management-page',
   standalone: true,
-  imports: [ReactiveFormsModule, LoadingSpinnerComponent, NgClass, FormsModule],
+  imports: [ReactiveFormsModule, NgClass, FormsModule, PageStateHandlerComponent],
   templateUrl: './admin-exam-management-page.component.html',
   styleUrls: ['./admin-exam-management-page.component.css'],
 })
-export class AdminExamManagementPageComponent implements OnInit {
-  isExamLoading = true;
-  isQuestionsLoading = true;
-
+export class AdminExamManagementPageComponent implements OnInit, OnDestroy {
+  pageState = PageState.init
   exam!: AdminExam;
   minutes!: number;
   hours!: number;
@@ -29,6 +30,9 @@ export class AdminExamManagementPageComponent implements OnInit {
   formGroup!: FormGroup;
   editing = false;
   modelName!: string;
+  protected error?: JsonResponse<any>;
+  protected readonly PageState = PageState;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private subjectService: SubjectService,
@@ -50,46 +54,60 @@ export class AdminExamManagementPageComponent implements OnInit {
       .filter((id: number | null): id is number => id !== null);
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  examDuration(duration: string) {
+    const hours = parseInt(duration.split(':').at(0)!);
+    const minutes = parseInt(duration.split(':').at(1)!);
+    return [hours, minutes];
+  }
+
   ngOnInit(): void {
-    this.loadData();
+    this.load();
   }
 
-  loadData(): void {
-    this.route.paramMap.subscribe((params) => {
-      this.subjectId = params.get('subjectId')!;
-      const examId = params.get('examId')!;
+  load(): void {
+    this.pageState = PageState.init
+    this.route.paramMap
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap((params) => {
+          this.subjectId = params.get('subjectId')!;
+          const examId = params.get('examId')!;
+          return forkJoin({
+            exam: this.loadExam(this.subjectId, examId),
+            questions: this.loadAvailableQuestions(),
+          });
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          this.pageState = PageState.Loaded;
+          console.log("DEBUG POINT 84")
+          this.exam = data.exam;
+          this.modelName = this.exam.modelName;
+          [this.hours, this.minutes] = this.examDuration(data.exam.duration)
+          //
+          this.subjectQuestions = data.questions;
+          this.initializeFormArray();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.error = error.error;
+          this.pageState = PageState.Error;
+        },
+      });
 
-      this.isExamLoading = true;
-      this.isQuestionsLoading = true;
-
-      this.loadExam(this.subjectId, examId);
-      this.loadAvailableQuestions();
-    });
   }
 
-  loadExam(subjectId: string, examId: string): void {
-    this.examService.GetExamById(subjectId, examId).subscribe({
-      next: (exam) => {
-        this.exam = exam;
-        this.isExamLoading = false;
-        this.initializeFormArray();
-        this.hours = parseInt(this.exam.duration.split(':').at(0)!);
-        this.minutes = parseInt(this.exam.duration.split(':').at(1)!);
-        this.modelName = this.exam.modelName;
-      },
-      error: (error) => console.error('Error loading exam:', error),
-    });
+  loadExam(subjectId: string, examId: string) {
+    return this.examService.GetExamById(subjectId, examId);
   }
 
-  loadAvailableQuestions(): void {
-    this.subjectService.GetQuestionsBySubjectId(this.subjectId).subscribe({
-      next: (questions) => {
-        this.subjectQuestions = questions;
-        this.isQuestionsLoading = false;
-        this.initializeFormArray();
-      },
-      error: (error: HttpErrorResponse) => console.error('Error loading questions:', error),
-    });
+  loadAvailableQuestions(): Observable<AdminQuestion[]> {
+    return this.subjectService.GetQuestionsBySubjectId(this.subjectId);
   }
 
   onSubmit(): void {
@@ -98,7 +116,7 @@ export class AdminExamManagementPageComponent implements OnInit {
       return;
     }
     this.examService.UpdateExamQuestions(this.subjectId, this.exam.id.toString(), this.selectedQuestions).subscribe({
-      next: () => this.loadData(),
+      next: () => this.load(),
       error: (err) => console.error('Error updating exam:', err),
     });
   }
@@ -111,7 +129,7 @@ export class AdminExamManagementPageComponent implements OnInit {
       console.log(updatedExam);
       this.examService.UpdateExamDetails(this.subjectId, this.exam.id.toString(), updatedExam).subscribe({
         next: (result) => {
-          this.loadData();
+          this.load();
         },
         error: (err) => {
           console.log('Error updating exam:', err)
@@ -139,8 +157,6 @@ export class AdminExamManagementPageComponent implements OnInit {
   }
 
   private initializeFormArray(): void {
-    if (this.isQuestionsLoading || this.isExamLoading) return;
-
     const questionsArray = this.fb.array(
       this.subjectQuestions.map((question) =>
         this.fb.control(this.exam.questions.some((q) => q.id === question.id))

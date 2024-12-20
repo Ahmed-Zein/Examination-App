@@ -7,8 +7,8 @@ import {ExamResultsTableComponent} from '../../../components/exam-results-table/
 import {NgbPagination} from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule} from '@angular/forms';
 import {Pagination} from '../../../core/models/pagination';
-import {HubConnection} from '@microsoft/signalr';
 import {NotificationService} from '../../../core/services/notification.service';
+import {Subject, takeUntil} from 'rxjs';
 
 @Component({
   selector: 'app-admin-exam-results-page',
@@ -29,7 +29,7 @@ export class AdminExamResultsPageComponent implements OnInit, OnDestroy {
   pagination!: Pagination<ExamResult[]>;
   pageSize = 10;
   private signalAction!: (data: string, level: number) => void;
-  private signalConnection!: HubConnection;
+  private destroy$ = new Subject<void>();
 
   constructor(private examResultsService: ExamResultsService, private notificationService: NotificationService) {
   }
@@ -39,28 +39,29 @@ export class AdminExamResultsPageComponent implements OnInit, OnDestroy {
     this.signalAction = (data: string, level: number) => {
       this.loadExamResults();
     }
-    this.signalConnection = this.notificationService.Connection;
-    this.signalConnection.on("ReceiveNotification", this.signalAction);
+    this.notificationService.OnReceiveNotification(this.signalAction);
   }
 
   ngOnDestroy(): void {
-    this.signalConnection.off("ReceiveNotification", this.signalAction);
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.notificationService.DestroyOnReceiveNotification(this.signalAction);
   }
 
   loadExamResults() {
-    this.examResultsService.GetExamResults(this.page, this.pageSize).subscribe({
-      next: (response: any) => {
-        console.log(response);
-        this.pagination = response.data;
-        this.examResults = response.data!.data;
-        this.isLoading = false;
+    this.examResultsService.GetExamResults(this.page, this.pageSize)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.pagination = response.data;
+          this.examResults = response.data!.data;
+          this.isLoading = false;
 
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error(error);
-        this.isLoading = false;
-      }
-    })
+        },
+        error: (error: HttpErrorResponse) => {
+          this.isLoading = false;
+        }
+      })
   }
 
   paginationHandler(page: number) {
