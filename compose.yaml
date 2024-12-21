@@ -22,6 +22,7 @@
     volumes:
       - rabbit_data:/var/lib/rabbitmq
   api:
+    container_name: web-api
     image: api
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
@@ -31,7 +32,9 @@
     ports:
       - "8080:8080"
       - "8081:8081"
+  
   webui:
+    container_name: web-ui
     build:
       context: Web.UI
       dockerfile: Dockerfile
@@ -42,11 +45,11 @@ volumes:
   sql_data:
     driver: local
   rabbit_data:
-
-#  mailserver:
-#    image: rnwood/smtp4dev
-#    container_name: mail-server
-#    ports:
-#      - "5000:80"
-#      - "2525:25"
-#
+  
+  #  mailserver:
+  #    image: rnwood/smtp4dev
+  #    container_name: mail-server
+  #    ports:
+  #      - "5000:80"
+  #      - "2525:25"
+  #

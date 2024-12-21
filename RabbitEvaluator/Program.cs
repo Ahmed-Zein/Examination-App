@@ -12,18 +12,16 @@ internal static class Program
 {
     public static async Task Main(string[] args)
     {
-        var configurationBuilder = new ConfigurationBuilder()
-            .SetBasePath("/home/ava/dev/atos/ExaminationSystem/API/")
-            .AddJsonFile("appsettings.Development.json");
-        var configuration = configurationBuilder.Build();
-
         var builder = WebApplication.CreateBuilder(args);
-        builder.Configuration.Bind(configuration);
+
+        builder.Configuration
+            .AddJsonFile("appsettings.Development.json")
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
 
         builder.Services.AddLogging();
         builder.Services.AddApplication();
-        builder.Services.AddSingleton<IConfiguration>(configuration);
-        builder.Services.AddInfrastructure(configuration, builder.Environment);
+        builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+        builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
         var serviceProvider = builder.Services.BuildServiceProvider();
 
