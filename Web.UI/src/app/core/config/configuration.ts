@@ -4,7 +4,8 @@ type Environment = 'dev' | 'docker';
 
 @Injectable({providedIn: 'root'})
 export default class Configuration {
-  environment: Environment = 'dev';
+//   environment: Environment = 'dev';
+  environment: Environment = 'docker';
   source: Record<Environment, AppSettingsBase> = {
     dev: new Development(),
     docker: new Docker(),
