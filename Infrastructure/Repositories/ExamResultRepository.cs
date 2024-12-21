@@ -94,7 +94,7 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
             "endtime" => examResult => examResult.EndTime ?? new DateTime(),
             "studentscore" => examResult => examResult.StudentScore,
             "status" => examResult => examResult.Status,
-            _ => examResult => examResult.StartTime,
+            _ => examResult => examResult.StartTime
         };
     }
 }

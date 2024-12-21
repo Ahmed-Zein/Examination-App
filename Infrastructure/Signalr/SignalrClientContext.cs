@@ -58,7 +58,10 @@ public class SignalrClientContext(IConfiguration configuration) : ISignalrClient
         return "";
     }
 
-    public bool IsConnected() => _hubConnection?.State == HubConnectionState.Connected;
+    public bool IsConnected()
+    {
+        return _hubConnection?.State == HubConnectionState.Connected;
+    }
 
     public async Task TerminateConnection()
     {

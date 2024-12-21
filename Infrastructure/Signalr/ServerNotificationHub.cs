@@ -14,9 +14,7 @@ public class ServerNotificationHub : Hub<INotificationClient>, IServerNotificati
     {
         await Clients.Client(Context.ConnectionId).ReceiveNotification("Welcome on Board");
         if (Context.User?.IsInRole(AuthRolesConstants.Admin) ?? true)
-        {
             await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroupName);
-        }
     }
 
     public async Task OnExamEvaluation(string userId)

@@ -7,11 +7,16 @@ namespace API.Controller;
 
 [Route("api/heartbeat")]
 [ApiController]
-public class HeartBeatController(IRabbitPublisher rabbit, IHubContext<ServerNotificationHub, INotificationClient> context)
+public class HeartBeatController(
+    IRabbitPublisher rabbit,
+    IHubContext<ServerNotificationHub, INotificationClient> context)
     : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok();
+    public IActionResult Get()
+    {
+        return Ok();
+    }
 
     [HttpGet("signalr")]
     public IActionResult Notify()

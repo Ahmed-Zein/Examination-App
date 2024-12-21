@@ -31,10 +31,10 @@
     ports:
       - "8080:8080"
       - "8081:8081"
-  webUI:
-    image: ui
+  webui:
     build:
-      dockerfile: Web.UI/Dockerfile
+      context: Web.UI
+      dockerfile: Dockerfile
     ports:
       - "4200:4200"
 

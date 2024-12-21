@@ -30,7 +30,7 @@ public class DashboardRepository(AppDbContext context, RoleManager<IdentityRole>
         {
             TotalStudents = totalStudent,
             TotalSubjects = totalSubjects,
-            TotalExamsTaken = totalExamResults,
+            TotalExamsTaken = totalExamResults
         };
     }
 
@@ -49,11 +49,10 @@ public class DashboardRepository(AppDbContext context, RoleManager<IdentityRole>
         return Result.Ok(
             new StudentDashboard()
             {
-                Name = $"{student.FirstName} {student.LastName}" ,
+                Name = $"{student.FirstName} {student.LastName}",
                 TotalExams = totalExamResults,
                 TotalExamsInEvaluation = totalExamsInEvaluation,
-                PassedExams = totalExamPassed,
-                
+                PassedExams = totalExamPassed
             });
     }
 }
