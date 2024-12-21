@@ -82,7 +82,7 @@ public class ExamRepository(AppDbContext context) : IExamRepository
                 .Where(exam => exam.SubjectId == subjectId)
                 .Join(context.ExamQuestions, exam => exam.Id, examQuestion => examQuestion.ExamId,
                     (exam, examQuestion) => exam)
-                .OrderBy(exam => new Guid())
+                .OrderBy(_ => Guid.NewGuid())
                 .Select(exam => exam.Id)
                 .FirstOrDefaultAsync();
         if (examId is 0)
