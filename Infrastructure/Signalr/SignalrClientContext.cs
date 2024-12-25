@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 
 namespace Infrastructure.Signalr;
 
-// TODO: USE get the configuration from the DI container
 public class SignalrClientContext(IConfiguration configuration) : ISignalrClientContext
 {
     private HubConnection? _hubConnection;
@@ -21,7 +20,9 @@ public class SignalrClientContext(IConfiguration configuration) : ISignalrClient
     {
         _hubConnection ??= new HubConnectionBuilder()
             .WithUrl(_serverUrl, options =>
-                options.AccessTokenProvider = () => SignIn(_email, _password)!).Build();
+                options.AccessTokenProvider = () => SignIn(_email, _password)!)
+            .WithAutomaticReconnect()
+            .Build();
 
         await _hubConnection.StartAsync();
         Console.WriteLine($"Signalr Connection Established With the Server: {_serverUrl}");

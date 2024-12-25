@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
 USER $APP_UID
 WORKDIR /app
 
@@ -11,7 +11,6 @@ COPY ["Application/Application.csproj", "Application/"]
 COPY ["Core/Core.csproj", "Core/"]
 COPY ["API/API.csproj", "API/"]
 RUN dotnet restore "RabbitEvaluator/RabbitEvaluator.csproj"
-COPY . .
 WORKDIR "/src/RabbitEvaluator"
 RUN dotnet build "RabbitEvaluator.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

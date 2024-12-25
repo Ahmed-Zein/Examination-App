@@ -42,6 +42,7 @@ internal static class Program
             _ = await rabbitConsumer.Consume();
         }
 
-        Console.ReadLine();
+        var tcs = new TaskCompletionSource();
+        await tcs.Task;
     }
 }

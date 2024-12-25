@@ -21,11 +21,9 @@
       RABBITMQ_DEFAULT_PASS: string123
     volumes:
       - rabbit_data:/var/lib/rabbitmq
-  api:
-    container_name: web-api
-    image: api
+  webserver:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
+      ASPNETCORE_ENVIRONMENT: Docker
     build:
       context: .
       dockerfile: API/Dockerfile
@@ -34,12 +32,20 @@
       - "8081:8081"
   
   webui:
-    container_name: web-ui
     build:
       context: Web.UI
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
+  evaluation_service:
+    depends_on:
+      - webserver
+      - rabbitmq
+    build:
+      context: .
+      dockerfile: RabbitEvaluator/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
 
 volumes:
   sql_data:
