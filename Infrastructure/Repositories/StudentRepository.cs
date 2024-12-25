@@ -1,7 +1,7 @@
-using Application.Interfaces.Persistence;
 using Core.Constants;
 using Core.Entities;
 using Core.Models;
+using Core.Persistence;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -52,7 +52,7 @@ public class StudentRepository(
             return studentResult.ToResult();
 
         var stu = studentResult.Value!;
-        stu.isLocked = !stu.isLocked;
+        stu.IsLocked = !stu.IsLocked;
 
         return Result.Ok(stu);
     }

@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Application.Interfaces.Persistence;
 using Core.Constants;
 using Core.Entities;
 using Core.Models;
+using Core.Persistence;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

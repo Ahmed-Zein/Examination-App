@@ -1,6 +1,6 @@
 using Core.Entities;
 
-namespace Application.Interfaces.Persistence;
+namespace Core.Persistence;
 
 public interface IQuestionRepository : IRepository<Question>
 {

@@ -1,6 +1,6 @@
-using Application.Interfaces.Persistence;
 using Core.Entities;
 using Core.Interfaces;
+using Core.Persistence;
 using Infrastructure.Data;
 using Infrastructure.RabbitMQ;
 using Infrastructure.Repositories;

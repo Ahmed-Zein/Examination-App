@@ -1,5 +1,5 @@
-using Application.Interfaces.Persistence;
 using Core.Entities;
+using Core.Persistence;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 

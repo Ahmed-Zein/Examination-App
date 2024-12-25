@@ -48,7 +48,7 @@ public sealed class AuthService(
             return _handelInvalidLogin(signInResult);
 
         var user = (await signInManager.UserManager.FindByEmailAsync(loginRequestDto.Email))!;
-        if (user.isLocked)
+        if (user.IsLocked)
             return Result.Fail("Your account is locked");
 
         var roles = await userManager.GetRolesAsync(user);
@@ -60,7 +60,7 @@ public sealed class AuthService(
     {
         var user = await userManager.FindByIdAsync(userId);
         return user is not null
-            ? user.isLocked ? Result.Fail(["User is Locked out"]) : Result.Ok(false)
+            ? user.IsLocked ? Result.Fail(["User is Locked out"]) : Result.Ok(false)
             : Result.Fail("User does not exist");
     }
 

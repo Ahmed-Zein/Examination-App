@@ -2,7 +2,7 @@ using Core.Entities;
 using Core.Models;
 using FluentResults;
 
-namespace Application.Interfaces.Persistence;
+namespace Core.Persistence;
 
 public interface IExamResultRepository : IRepository<ExamResult>
 {

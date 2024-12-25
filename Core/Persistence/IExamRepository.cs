@@ -1,7 +1,7 @@
 using Core.Entities;
 using FluentResults;
 
-namespace Application.Interfaces.Persistence;
+namespace Core.Persistence;
 
 public interface IExamRepository : IRepository<Exam>
 {

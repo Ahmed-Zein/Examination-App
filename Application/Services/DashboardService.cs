@@ -1,6 +1,6 @@
-using Application.DTOs;
 using Application.Interfaces;
-using Application.Interfaces.Persistence;
+using Core.Models;
+using Core.Persistence;
 using FluentResults;
 
 namespace Application.Services;

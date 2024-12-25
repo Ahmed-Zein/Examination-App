@@ -1,7 +1,7 @@
-using Application.DTOs;
-using Application.Interfaces.Persistence;
 using Core.Constants;
 using Core.Enums;
+using Core.Models;
+using Core.Persistence;
 using FluentResults;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;

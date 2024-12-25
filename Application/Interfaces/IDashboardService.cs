@@ -1,4 +1,4 @@
-using Application.DTOs;
+using Core.Models;
 using FluentResults;
 
 namespace Application.Interfaces;

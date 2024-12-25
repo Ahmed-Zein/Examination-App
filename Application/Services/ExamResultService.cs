@@ -1,8 +1,8 @@
 using Application.DTOs;
 using Application.Interfaces;
-using Application.Interfaces.Persistence;
 using AutoMapper;
 using Core.Models;
+using Core.Persistence;
 using FluentResults;
 
 namespace Application.Services;

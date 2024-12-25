@@ -1,11 +1,11 @@
 using Application.DTOs;
 using Application.Interfaces;
-using Application.Interfaces.Persistence;
 using Application.Models;
 using Core.Constants;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces;
+using Core.Persistence;
 using FluentResults;
 
 namespace Application.Services;

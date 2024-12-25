@@ -1,5 +1,5 @@
 using Application.DTOs;
-using Application.Interfaces.Persistence;
+using Core.Persistence;
 using FluentValidation;
 
 namespace Application.Validators;

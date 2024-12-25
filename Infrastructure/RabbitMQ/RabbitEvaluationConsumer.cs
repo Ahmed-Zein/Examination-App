@@ -38,7 +38,7 @@ public class RabbitEvaluationConsumer(
         _channel ??= await _CreateChannel();
         var consumer = await CreateConsumer(_channel);
 
-        consumer.ReceivedAsync += async (sender, eventArgs) =>
+        consumer.ReceivedAsync += async (_, eventArgs) =>
         {
             var message = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
             var evaluationRequest = JsonSerializer.Deserialize<RabbitExamRequest>(message);
@@ -69,7 +69,7 @@ public class RabbitEvaluationConsumer(
     {
         _connection ??= await _connectionFactory.CreateConnectionAsync();
 
-        return await _connection!.CreateChannelAsync();
+        return await _connection.CreateChannelAsync();
     }
 
     private async Task<AsyncEventingBasicConsumer> CreateConsumer(IChannel channel)
