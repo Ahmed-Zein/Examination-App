@@ -39,7 +39,7 @@ public class RabbitPublisher(IRabbitConfig config) : IRabbitPublisher, IDisposab
     {
         _connection ??= await _connectionFactory.CreateConnectionAsync();
 
-        return await _connection!.CreateChannelAsync();
+        return await _connection.CreateChannelAsync();
     }
 
     private async Task DisposeAsync()

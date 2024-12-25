@@ -20,8 +20,12 @@ public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, 
     public IAnswerRepository AnswerRepository => _answerRepository ??= new AnswerRepository(context);
     public ISubjectRepository SubjectRepository => _subjectRepository ??= new SubjectRepository(context);
     public IQuestionRepository QuestionRepository => _questionRepository ??= new QuestionRepository(context);
-    public IExamResultRepository ExamResultRepository => _examResultRepository ??= new ExamResultRepository(context);
-    public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(context, userManager);
+
+    public IExamResultRepository ExamResultRepository => _examResultRepository ??=
+        new ExamResultRepository(context, new PaginationDataBuilder<ExamResult>());
+
+    public IStudentRepository StudentRepository => _studentRepository ??=
+        new StudentRepository(context, userManager, new PaginationDataBuilder<AppUser>());
 
     public IDashboardRepository DashboardRepository =>
         _dashboardRepository ??= new DashboardRepository(context, roleManager);

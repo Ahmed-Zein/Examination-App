@@ -9,23 +9,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class ExamResultRepository(AppDbContext context) : IExamResultRepository
+public class ExamResultRepository(AppDbContext context, IPaginationDataBuilder<ExamResult> pageBuilder)
+    : IExamResultRepository
 {
     public Task<bool> AnyAsync(int id)
     {
         return context.ExamResults.AnyAsync(e => e.Id == id);
     }
 
-    public Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery query, SortingQuery sortingQuery)
+    public async Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery pagination, SortingQuery sortingQuery)
     {
-        var examResultsQuery = context.ExamResults
+        var query = context.ExamResults
             .Include(e => e.AppUser)
             .AsNoTracking();
-        examResultsQuery = sortingQuery.Ascending ?? true
-            ? examResultsQuery.OrderBy(GetSortingProperty(sortingQuery))
-            : examResultsQuery.OrderByDescending(GetSortingProperty(sortingQuery));
+        query = sortingQuery.Ascending ?? true
+            ? query.OrderBy(GetSortingProperty(sortingQuery))
+            : query.OrderByDescending(GetSortingProperty(sortingQuery));
 
-        return PagedData<ExamResult>.CreateAsync(examResultsQuery, query);
+        return await pageBuilder
+            .WithQueryable(query)
+            .WithPagination(pagination)
+            .Build();
     }
 
 
@@ -38,12 +42,15 @@ public class ExamResultRepository(AppDbContext context) : IExamResultRepository
 
     public async Task<Result<PagedData<ExamResult>>> GetByStudentId(string studentId, PaginationQuery pagination)
     {
-        var examQuery = context.ExamResults
+        var query = context.ExamResults
             .Where(e => e.AppUserId == studentId)
             .OrderByDescending(e => e.StartTime)
             .AsNoTracking();
 
-        return Result.Ok(await PagedData<ExamResult>.CreateAsync(examQuery, pagination));
+        return Result.Ok(await pageBuilder
+            .WithQueryable(query)
+            .WithPagination(pagination)
+            .Build());
     }
 
     public async Task<Result<ExamResult>> GetByIdAsync(int id)

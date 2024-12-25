@@ -7,5 +7,5 @@ namespace Core.Persistence;
 public interface IExamResultRepository : IRepository<ExamResult>
 {
     Task<Result<PagedData<ExamResult>>> GetByStudentId(string studentId, PaginationQuery pagination);
-    Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery query, SortingQuery sorting);
+    Task<PagedData<ExamResult>> GetAllAsync(PaginationQuery pagination, SortingQuery sorting);
 }

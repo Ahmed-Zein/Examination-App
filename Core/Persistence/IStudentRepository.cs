@@ -6,7 +6,7 @@ namespace Core.Persistence;
 
 public interface IStudentRepository
 {
-    Task<PagedData<AppUser>> GetAllAsync(PaginationQuery query);
+    Task<PagedData<AppUser>> GetAllAsync(PaginationQuery pagination);
     Task<bool> Exists(string userId);
     Task<Result<AppUser>> GetByIdAsync(string id);
 

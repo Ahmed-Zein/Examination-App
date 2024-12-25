@@ -11,24 +11,30 @@ namespace Infrastructure.Repositories;
 
 public class StudentRepository(
     AppDbContext context,
-    UserManager<AppUser> userManager)
+    UserManager<AppUser> userManager,
+    PaginationDataBuilder<AppUser> pageBuilder
+)
     : IStudentRepository
 {
-    public async Task<PagedData<AppUser>> GetAllAsync(PaginationQuery query)
+    public async Task<PagedData<AppUser>> GetAllAsync(PaginationQuery pagination)
     {
-        var studentsQuery =
+        var query =
             context.Roles.Where(role => role.Name!.Equals(AuthRolesConstants.Student)).Join(context.UserRoles,
                     role => role.Id, userRole => userRole.RoleId, (role, userRoles) => userRoles)
                 .Join(context.Users, userRole => userRole.UserId, user => user.Id, (userRole, user) => user)
                 .AsNoTracking();
-        // // Used instead of writing two queries to get all students userIds then fetch them on another query 
+
+        // Used instead of writing two queries to get all students userIds then fetch them on another query 
         // var studentsQuery =
         //     from user in context.Users
         //     join userRole in context.UserRoles on user.Id equals userRole.UserId
         //     where userRole.RoleId == studentRole
         //     select user;
 
-        return await PagedData<AppUser>.CreateAsync(studentsQuery, query);
+        return await pageBuilder
+            .WithQueryable(query)
+            .WithPagination(pagination)
+            .Build();
     }
 
     public async Task<bool> Exists(string userId)
