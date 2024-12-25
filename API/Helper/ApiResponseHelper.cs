@@ -1,4 +1,4 @@
-using API.Models;
+using Application.Models;
 using Core.Constants;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;

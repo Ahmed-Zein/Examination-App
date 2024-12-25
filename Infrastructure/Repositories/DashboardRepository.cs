@@ -47,7 +47,7 @@ public class DashboardRepository(AppDbContext context, RoleManager<IdentityRole>
             .Where(exam => exam.StudentScore > (decimal)(exam.TotalScore * 0.60) && exam.AppUserId == studentId)
             .CountAsync();
         return Result.Ok(
-            new StudentDashboard()
+            new StudentDashboard
             {
                 Name = $"{student.FirstName} {student.LastName}",
                 TotalExams = totalExamResults,

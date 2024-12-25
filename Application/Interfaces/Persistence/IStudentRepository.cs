@@ -1,4 +1,3 @@
-using Application.Models;
 using Core.Entities;
 using Core.Models;
 using FluentResults;

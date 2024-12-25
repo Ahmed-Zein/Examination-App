@@ -29,7 +29,7 @@ public class HeartBeatController(
     public async Task<IActionResult> GetRabbit()
     {
         var message = new
-            { Success = true, list = new List<string>() { "list 1", "list 2" }, number = 1, str = "test str" };
+            { Success = true, list = new List<string> { "list 1", "list 2" }, number = 1, str = "test str" };
 
         await rabbit.Publish(message);
 

@@ -1,5 +1,4 @@
 using Application.Interfaces.Persistence;
-using Application.Models;
 using Core.Constants;
 using Core.Entities;
 using Core.Models;

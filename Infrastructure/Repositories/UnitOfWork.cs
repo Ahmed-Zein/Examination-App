@@ -8,13 +8,13 @@ namespace Infrastructure.Repositories;
 public class UnitOfWork(AppDbContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
     : IUnitOfWork
 {
-    private IExamRepository? _examRepository;
     private IAnswerRepository? _answerRepository;
-    private ISubjectRepository? _subjectRepository;
-    private IStudentRepository? _studentRepository;
-    private IQuestionRepository? _questionRepository;
     private IDashboardRepository? _dashboardRepository;
+    private IExamRepository? _examRepository;
     private IExamResultRepository? _examResultRepository;
+    private IQuestionRepository? _questionRepository;
+    private IStudentRepository? _studentRepository;
+    private ISubjectRepository? _subjectRepository;
 
     public IExamRepository ExamRepository => _examRepository ??= new ExamRepository(context);
     public IAnswerRepository AnswerRepository => _answerRepository ??= new AnswerRepository(context);

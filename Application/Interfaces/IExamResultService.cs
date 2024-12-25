@@ -1,5 +1,4 @@
 using Application.DTOs;
-using Application.Models;
 using Core.Models;
 using FluentResults;
 

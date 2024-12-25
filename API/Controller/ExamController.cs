@@ -1,10 +1,8 @@
 using System.Security.Claims;
 using API.Helper;
-using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
-using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,7 +1,7 @@
 using API.Helper;
-using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Models;
 using Core.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

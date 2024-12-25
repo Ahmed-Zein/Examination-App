@@ -20,7 +20,7 @@ public sealed class TokenService(IConfiguration config) : ITokenService
 
         var signInCredential = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
 
-        var tokenDescriptor = new SecurityTokenDescriptor()
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddDays(7),

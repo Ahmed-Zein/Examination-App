@@ -6,7 +6,6 @@ using AutoMapper;
 using Core.Constants;
 using Core.Entities;
 using FluentResults;
-using FluentValidation;
 
 namespace Application.Services;
 

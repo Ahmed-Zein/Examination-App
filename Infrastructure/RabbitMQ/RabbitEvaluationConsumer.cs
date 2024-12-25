@@ -21,24 +21,16 @@ public class RabbitEvaluationConsumer(
         ClientProvidedName = "Examination App"
     };
 
-    private IConnection? _connection;
     private IChannel? _channel;
 
-    private async Task<IChannel> _CreateChannel()
+    private IConnection? _connection;
+
+    public void Dispose()
     {
-        _connection ??= await _connectionFactory.CreateConnectionAsync();
+        Console.WriteLine("Stopping RabbitEvaluationConsumer");
 
-        return await _connection!.CreateChannelAsync();
-    }
-
-    private async Task<AsyncEventingBasicConsumer> CreateConsumer(IChannel channel)
-    {
-        await channel.ExchangeDeclareAsync(config.Exchange, ExchangeType.Topic);
-        await channel.QueueDeclareAsync(config.Queue, true, false, false);
-        await channel.QueueBindAsync(config.Queue, config.Exchange, config.RoutingKey);
-        await channel.BasicQosAsync(0, 1, false);
-
-        return new AsyncEventingBasicConsumer(channel);
+        _channel?.Dispose();
+        _connection?.Dispose();
     }
 
     public async Task<AsyncEventingBasicConsumer> Consume()
@@ -73,11 +65,20 @@ public class RabbitEvaluationConsumer(
         return consumer;
     }
 
-    public void Dispose()
+    private async Task<IChannel> _CreateChannel()
     {
-        Console.WriteLine("Stopping RabbitEvaluationConsumer");
+        _connection ??= await _connectionFactory.CreateConnectionAsync();
 
-        _channel?.Dispose();
-        _connection?.Dispose();
+        return await _connection!.CreateChannelAsync();
+    }
+
+    private async Task<AsyncEventingBasicConsumer> CreateConsumer(IChannel channel)
+    {
+        await channel.ExchangeDeclareAsync(config.Exchange, ExchangeType.Topic);
+        await channel.QueueDeclareAsync(config.Queue, true, false, false);
+        await channel.QueueBindAsync(config.Queue, config.Exchange, config.RoutingKey);
+        await channel.BasicQosAsync(0, 1, false);
+
+        return new AsyncEventingBasicConsumer(channel);
     }
 }

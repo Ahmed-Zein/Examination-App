@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Security.Claims;
-using API.Models;
 using Application.Interfaces;
+using Application.Models;
 using Core.Constants;
 
 namespace API.Middleware;

@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using Core.Interfaces;
-using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 
 namespace Infrastructure.RabbitMQ;
@@ -14,14 +13,13 @@ public class RabbitPublisher(IRabbitConfig config) : IRabbitPublisher, IDisposab
         ClientProvidedName = "Examination App"
     };
 
-    private IConnection? _connection;
     private IChannel? _channel;
 
-    private async Task<IChannel> _CreateChannel()
-    {
-        _connection ??= await _connectionFactory.CreateConnectionAsync();
+    private IConnection? _connection;
 
-        return await _connection!.CreateChannelAsync();
+    public void Dispose()
+    {
+        _ = DisposeAsync();
     }
 
     public async Task Publish<T>(T message)
@@ -37,6 +35,13 @@ public class RabbitPublisher(IRabbitConfig config) : IRabbitPublisher, IDisposab
         await _channel.BasicPublishAsync(config.Exchange, config.RoutingKey, body);
     }
 
+    private async Task<IChannel> _CreateChannel()
+    {
+        _connection ??= await _connectionFactory.CreateConnectionAsync();
+
+        return await _connection!.CreateChannelAsync();
+    }
+
     private async Task DisposeAsync()
     {
         if (_channel is not null)
@@ -44,11 +49,6 @@ public class RabbitPublisher(IRabbitConfig config) : IRabbitPublisher, IDisposab
 
         if (_connection is not null)
             await _connection.CloseAsync();
-    }
-
-    public void Dispose()
-    {
-        _ = DisposeAsync();
     }
 }
 // Sending & receiving objects

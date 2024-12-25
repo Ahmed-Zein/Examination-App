@@ -31,7 +31,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
         {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ??
-                                 throw new ArgumentNullException($"No connection string"));
+                                 throw new InvalidOperationException("Missing DefaultConnection"));
             if (environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
 

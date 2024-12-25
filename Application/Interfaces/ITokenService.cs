@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Core.Entities;
-using FluentResults;
 
 namespace Application.Interfaces;
 

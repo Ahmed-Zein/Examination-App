@@ -24,7 +24,7 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
 
         await unitOfWork.CommitAsync();
 
-        await rabbitPublisher.Publish(new RabbitExamRequest()
+        await rabbitPublisher.Publish(new RabbitExamRequest
             { StudentId = studentId, ExamId = examId, Solutions = examSolutionsDto });
         return Result.Ok();
     }

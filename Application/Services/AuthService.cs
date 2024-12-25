@@ -1,6 +1,5 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
-using Application.Interfaces.Persistence;
 using Core.Constants;
 using Core.Entities;
 using FluentResults;
@@ -15,7 +14,7 @@ public sealed class AuthService(
 {
     public async Task<Result<AuthenticationResponseDto>> Register(RegisterRequestDto registerRequestDto)
     {
-        var user = new AppUser()
+        var user = new AppUser
         {
             FirstName = registerRequestDto.FirstName,
             LastName = registerRequestDto.LastName,

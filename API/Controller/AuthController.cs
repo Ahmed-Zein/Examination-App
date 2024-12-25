@@ -1,6 +1,6 @@
-using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controller;

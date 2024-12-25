@@ -10,13 +10,6 @@ public class ServerNotificationHub : Hub<INotificationClient>, IServerNotificati
 {
     private const string AdminGroupName = AuthRolesConstants.Admin;
 
-    public override async Task OnConnectedAsync()
-    {
-        await Clients.Client(Context.ConnectionId).ReceiveNotification("Welcome on Board");
-        if (Context.User?.IsInRole(AuthRolesConstants.Admin) ?? true)
-            await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroupName);
-    }
-
     public async Task OnExamEvaluation(string userId)
     {
         await Clients.User(userId).ReceiveNotification("Your exam evaluation has been completed.", 1);
@@ -25,6 +18,13 @@ public class ServerNotificationHub : Hub<INotificationClient>, IServerNotificati
     public async Task BroadCast(string message)
     {
         await Clients.All.ReceiveNotification(message);
+    }
+
+    public override async Task OnConnectedAsync()
+    {
+        await Clients.Client(Context.ConnectionId).ReceiveNotification("Welcome on Board");
+        if (Context.User?.IsInRole(AuthRolesConstants.Admin) ?? true)
+            await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroupName);
     }
 }
 

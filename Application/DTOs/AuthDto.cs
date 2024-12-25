@@ -28,14 +28,14 @@ public class AuthenticationResponseDto
     public static AuthenticationResponseDto Success(string token, string message)
     {
         return
-            new AuthenticationResponseDto()
+            new AuthenticationResponseDto
                 { Message = message, Token = token };
     }
 
     public static AuthenticationResponseDto Fail(string message)
     {
         return
-            new AuthenticationResponseDto()
+            new AuthenticationResponseDto
                 { Message = message };
     }
 }

@@ -1,5 +1,4 @@
 using Application.DTOs;
-using Core.Entities;
 using FluentResults;
 
 namespace Application.Interfaces;

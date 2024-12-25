@@ -1,17 +1,17 @@
 using FluentResults;
 
-namespace API.Models;
+namespace Application.Models;
 
 public class JsonResponse<T>
 {
+    private JsonResponse()
+    {
+    }
+
     public bool Success { get; init; }
     public T? Data { get; init; }
     public string Message { get; init; } = string.Empty;
     public List<string> Errors { get; init; } = [];
-
-    private JsonResponse()
-    {
-    }
 
     // Success response
     public static JsonResponse<T> Ok(T data, string message = "Success")

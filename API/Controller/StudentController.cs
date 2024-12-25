@@ -1,4 +1,3 @@
-using API.Models;
 using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
