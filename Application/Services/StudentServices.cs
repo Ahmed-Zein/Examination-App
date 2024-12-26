@@ -1,6 +1,7 @@
 using Application.DTOs;
 using Application.Interfaces;
 using AutoMapper;
+using Core.Constants;
 using Core.Models;
 using Core.Persistence;
 using FluentResults;
@@ -23,7 +24,7 @@ public class StudentServices(IUnitOfWork unitOfWork, IMapper mapper) : IStudentS
         return studentResult.IsSuccess switch
         {
             true => Result.Ok(mapper.Map<StudentDto>(studentResult.Value)),
-            false => Result.Fail<StudentDto>("Student not found")
+            false => Result.Fail<StudentDto>(["Student not found", ErrorType.NotFound])
         };
     }
 

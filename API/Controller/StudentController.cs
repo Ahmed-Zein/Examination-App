@@ -1,8 +1,11 @@
+using API.Helper;
 using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
 using Core.Constants;
+using Core.Interfaces;
 using Core.Models;
+using Infrastructure.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +14,11 @@ namespace API.Controller;
 [Authorize]
 [ApiController]
 [Route("api/students")]
-public class StudentController(IStudentServices studentServices, IDashboardService dashboardService) : ControllerBase
+public class StudentController(
+    ICacheStore cacheStore,
+    IStudentServices studentServices,
+    IDashboardService dashboardService,
+    ILogger<StudentController> logger) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = AuthRolesConstants.Admin)]
@@ -25,13 +32,24 @@ public class StudentController(IStudentServices studentServices, IDashboardServi
     [HttpGet("{studentId}")]
     public async Task<ActionResult<JsonResponse<StudentDto>>> GetByStudentId(string studentId)
     {
-        var serviceResult = await studentServices.GetByIdAsync(studentId);
-
-        return serviceResult.IsSuccess switch
+        var cachingKey = new StudentKey(studentId);
+        var cacheResult = cacheStore.Get(cachingKey);
+        if (cacheResult.IsSuccess)
         {
-            true => Ok(JsonResponse<StudentDto>.Ok(serviceResult.Value)),
-            false => NotFound(JsonResponse<StudentDto>.Error(serviceResult.Errors))
-        };
+            logger.LogInformation("Cache hit for studentId: {studentId} at {timeStamp}", studentId, DateTime.UtcNow);
+            return Ok(JsonResponse<StudentDto>.Ok(cacheResult.Value));
+        }
+
+        var serviceResult = await studentServices.GetByIdAsync(studentId);
+        if (!serviceResult.IsSuccess)
+        {
+            logger.LogWarning("Service failed for studentId: {studentId} at {timeStamp}", studentId, DateTime.UtcNow);
+            return (ActionResult)ApiResponseHelper.HandelError(serviceResult.Errors);
+        }
+
+        cacheStore.Add(cachingKey, serviceResult.Value);
+        logger.LogInformation("Cache updated for studentId: {studentId} at {timeStamp}", studentId, DateTime.UtcNow);
+        return Ok(JsonResponse<StudentDto>.Ok(serviceResult.Value));
     }
 
     [HttpPut("lock/{studentId}")]

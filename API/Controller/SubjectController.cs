@@ -3,6 +3,8 @@ using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
 using Core.Constants;
+using Core.Interfaces;
+using Infrastructure.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,13 +13,28 @@ namespace API.Controller;
 [Authorize]
 [ApiController]
 [Route("api/subjects")]
-public class SubjectController(ISubjectService subjectService) : ControllerBase
+public class SubjectController(
+    ICacheStore cacheStore,
+    ISubjectService subjectService,
+    ILogger<SubjectController> logger) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<JsonResponse<List<SubjectDto>>>> Get()
     {
-        var subjects = await subjectService.GetAllSubjects();
+        var cachingKey = new SubjectsListKey();
+        var cacheResults = cacheStore.Get(cachingKey);
+        if (cacheResults.IsSuccess)
+        {
+            logger.LogInformation("Cache hit for {noOfSubjects} students at {timeStamp}.", cacheResults.Value.Count,
+                DateTime.Now);
+            return Ok(JsonResponse<List<SubjectDto>>.Ok(cacheResults.Value));
+        }
 
+        var subjects = await subjectService.GetAllSubjects();
+        cacheStore.Add(cachingKey, subjects);
+
+        logger.LogInformation("Cache updated for {noOfSubjects} students at {timeStamp}.", cacheResults.Value.Count,
+            DateTime.Now);
         return Ok(JsonResponse<List<SubjectDto>>.Ok(subjects));
     }
 
