@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IEvaluationService, EvaluationService>();
         services.AddScoped<IExamResultService, ExamResultService>();
 
+        services.AddMediatR(options => options.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
         services.AddAutoMapper(typeof(AppMappersProfiles));
         services.AddValidatorsFromAssemblyContaining<CreateQuestionDtoValidator>();
 

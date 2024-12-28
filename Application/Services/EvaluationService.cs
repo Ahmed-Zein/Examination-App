@@ -1,3 +1,4 @@
+using Application.Commands.Notification.Student;
 using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
@@ -5,12 +6,15 @@ using Core.Constants;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces;
+using Core.Models;
 using Core.Persistence;
 using FluentResults;
+using MediatR;
 
 namespace Application.Services;
 
-public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPublisher) : IEvaluationService
+public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPublisher, IMediator mediator)
+    : IEvaluationService
 {
     public async Task<Result> ReceiveExamSolution(string studentId, int examId, ExamSolutionsDto examSolutionsDto)
     {
@@ -23,9 +27,17 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
         examResult.EndTime = DateTime.UtcNow;
 
         await unitOfWork.CommitAsync();
+        var notification = new StudentNotification
+        {
+            UserId = studentId,
+            Content = "Your solutions have been Received"
+        };
 
-        await rabbitPublisher.Publish(new RabbitExamRequest
-            { StudentId = studentId, ExamId = examId, Solutions = examSolutionsDto });
+        await mediator.Send(new CreateStudentNotificationCommand(notification));
+        // Handle the case when the rabbit is down???
+        Task.WaitAll(rabbitPublisher.Publish(new RabbitExamRequest
+            { StudentId = studentId, ExamId = examId, Solutions = examSolutionsDto }));
+
         return Result.Ok();
     }
 

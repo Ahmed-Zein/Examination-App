@@ -5,7 +5,7 @@ namespace Core.Interfaces;
 
 public interface IStudentNotificationRepository
 {
-    Task<StudentNotification> AddAsync(StudentNotification studentNotification);
+    Task AddAsync(StudentNotification studentNotification);
     Task<Result<List<StudentNotification>>> GetAsync(string userId);
-    Task<Result> Delete(string notificationId);
+    Task<Result> Delete(string studentId, string notificationId);
 }

@@ -25,7 +25,7 @@ public class NotificationDbContext
 
     private static void OnConfiguring()
     {
-        BsonClassMap.RegisterClassMap<StudentNotification>(cm =>
+        BsonClassMap.RegisterClassMap<NotificationBase>(cm =>
         {
             cm.AutoMap();
             cm.SetIgnoreExtraElements(true);
@@ -34,15 +34,31 @@ public class NotificationDbContext
                 .SetIdGenerator(StringObjectIdGenerator.Instance)
                 .SetElementName("_id");
 
-            cm.MapProperty(c => c.UserId).SetElementName("UserId");
             cm.MapProperty(c => c.Content).SetElementName("Content");
-            cm.MapProperty(c => c.CreatedAt).SetElementName("CreatedAt");
-
             cm.MapProperty(c => c.CreatedAt)
+                .SetElementName("CreatedAt")
                 .SetDefaultValue(DateTime.UtcNow);
+
             // Ignore for now
             // cm.MapProperty(c => c.IsRead).SetElementName("IsRead");
             // cm.MapProperty(c => c.ReadAt).SetElementName("ReadAt");
+        });
+        BsonClassMap.RegisterClassMap<StudentNotification>(cm =>
+        {
+            cm.AutoMap();
+            cm.SetIgnoreExtraElements(true);
+
+            cm.MapProperty(c => c.UserId).SetElementName("UserId");
+        });
+
+        BsonClassMap.RegisterClassMap<AdminNotification>(cm =>
+        {
+            cm.AutoMap();
+            cm.SetIgnoreExtraElements(true);
+            cm.MapProperty(c => c.Title).SetElementName("Title");
+            cm.MapProperty(c => c.Level)
+                .SetElementName("Level")
+                .SetDefaultValue(NotificationType.Information);
         });
     }
 }
