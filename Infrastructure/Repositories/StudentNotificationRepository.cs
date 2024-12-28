@@ -7,25 +7,25 @@ using MongoDB.Driver;
 
 namespace Infrastructure.Repositories;
 
-public class NotificationRepository(NotificationDbContext context) : INotificationRepository
+public class StudentNotificationRepository(NotificationDbContext context) : IStudentNotificationRepository
 {
     private const int MaxNotificationCount = 20;
     private readonly DateTime _notificationCutOffDate = DateTime.Now - TimeSpan.FromDays(7);
 
 
-    public async Task<Notification> AddAsync(Notification notification)
+    public async Task<StudentNotification> AddAsync(StudentNotification studentNotification)
     {
-        await context.Notifications.InsertOneAsync(notification);
-        return notification;
+        await context.StudentNotifications.InsertOneAsync(studentNotification);
+        return studentNotification;
     }
 
-    public async Task<Result<List<Notification>>> GetAsync(string userId)
+    public async Task<Result<List<StudentNotification>>> GetAsync(string userId)
     {
-        var filter = Builders<Notification>.Filter.And(
-            Builders<Notification>.Filter.Eq(n => n.UserId, userId),
-            Builders<Notification>.Filter.Gt(n => n.CreatedAt, _notificationCutOffDate)
+        var filter = Builders<StudentNotification>.Filter.And(
+            Builders<StudentNotification>.Filter.Eq(n => n.UserId, userId),
+            Builders<StudentNotification>.Filter.Gt(n => n.CreatedAt, _notificationCutOffDate)
         );
-        var notifications = await context.Notifications
+        var notifications = await context.StudentNotifications
             .Find(filter)
             .Limit(MaxNotificationCount)
             .ToListAsync();
@@ -38,7 +38,8 @@ public class NotificationRepository(NotificationDbContext context) : INotificati
     public async Task<Result> Delete(string notificationId)
     {
         var deleted =
-            await context.Notifications.DeleteOneAsync(Builders<Notification>.Filter.Eq(n => n.Id, notificationId));
+            await context.StudentNotifications.DeleteOneAsync(
+                Builders<StudentNotification>.Filter.Eq(n => n.Id, notificationId));
 
         return deleted is not null && deleted.IsAcknowledged
             ? Result.Ok()

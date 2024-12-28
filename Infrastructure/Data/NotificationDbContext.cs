@@ -17,11 +17,15 @@ public class NotificationDbContext
         OnConfiguring();
     }
 
-    public IMongoCollection<Notification> Notifications => _database.GetCollection<Notification>("Notifications");
+    public IMongoCollection<StudentNotification> StudentNotifications =>
+        _database.GetCollection<StudentNotification>("StudentNotifications");
+
+    public IMongoCollection<AdminNotification> AdminNotifications =>
+        _database.GetCollection<AdminNotification>("AdminNotifications");
 
     private static void OnConfiguring()
     {
-        BsonClassMap.RegisterClassMap<Notification>(cm =>
+        BsonClassMap.RegisterClassMap<StudentNotification>(cm =>
         {
             cm.AutoMap();
             cm.SetIgnoreExtraElements(true);

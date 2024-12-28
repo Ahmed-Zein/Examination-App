@@ -6,41 +6,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controller;
 
-[Route("api/users/{userId}/notifications")]
+[Route("api/")]
 [ApiController]
-public class NotificationController(INotificationRepository repository) : ControllerBase
+public class NotificationController(
+    IStudentNotificationRepository studentRepository,
+    IAdminNotificationRepository adminRepository) : ControllerBase
 {
-    // TODO: DELETE this  
-    [HttpPost]
-    public async Task<ActionResult<JsonResponse<Notification>>> Create(string userId)
+    [HttpGet("students/{studentId}/notifications")]
+    public async Task<ActionResult<JsonResponse<IEnumerable<StudentNotification>>>> GetStudentNotifications(
+        string studentId)
     {
-        var notification = new Notification
-        {
-            UserId = userId,
-            CreatedAt = DateTime.Now,
-            Content = "Created notification"
-        };
-        await repository.AddAsync(notification);
-        return Ok(JsonResponse<Notification>.Ok(notification));
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<JsonResponse<IEnumerable<Notification>>>> Get(string userId)
-    {
-        var notificationsResult = await repository.GetAsync(userId);
+        var notificationsResult = await studentRepository.GetAsync(studentId);
 
         return notificationsResult.IsSuccess
-            ? Ok(JsonResponse<IEnumerable<Notification>>.Ok(notificationsResult.Value))
+            ? Ok(JsonResponse<IEnumerable<StudentNotification>>.Ok(notificationsResult.Value))
             : ApiResponseHelper.HandelError(notificationsResult.Errors);
     }
 
-    [HttpDelete("{notificationId}")]
-    public async Task<IActionResult> Delete(string userId, string notificationId)
+    [HttpDelete("students/{studentId}/notifications/{notificationId}")]
+    public async Task<IActionResult> DeleteStudentNotification(string studentId, string notificationId)
     {
-        var notificationsResult = await repository.Delete(notificationId);
+        var notificationsResult = await studentRepository.Delete(notificationId);
 
         return notificationsResult.IsSuccess
             ? NoContent()
             : ApiResponseHelper.HandelError(notificationsResult.Errors);
+    }
+
+    [HttpDelete("admins/notifications")]
+    public async Task<IActionResult> GetAdminNotifications()
+    {
+        var notifications = await adminRepository.GetAllAsync();
+        return Ok(JsonResponse<IEnumerable<AdminNotification>>.Ok(notifications));
     }
 }

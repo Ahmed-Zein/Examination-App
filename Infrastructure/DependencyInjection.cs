@@ -24,7 +24,8 @@ public static class DependencyInjection
         services.AddScoped<IRabbitConsumer, RabbitEvaluationConsumer>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IAdminNotificationRepository, AdminNotificationRepository>();
+        services.AddScoped<IStudentNotificationRepository, StudentNotificationRepository>();
 
         services.AddMongoDb(configuration);
         services.AddAppCache(configuration);
