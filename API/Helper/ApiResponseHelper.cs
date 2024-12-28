@@ -7,7 +7,7 @@ namespace API.Helper;
 
 public static class ApiResponseHelper
 {
-    public static IActionResult HandelError(List<IError> errors)
+    public static ActionResult HandelError(List<IError> errors)
     {
         var responseBody = JsonResponse<object>.Error(errors);
         return errors.Last().Message switch
