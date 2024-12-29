@@ -20,6 +20,9 @@ import {
 } from './pages/admin/admin-exam-management-page/admin-exam-management-page.component';
 import {AdminDashboardPageComponent} from './pages/admin/admin-dashboard-page/admin-dashboard-page.component';
 import {StudentDashboardPageComponent} from './pages/student/student-dashboard-page/student-dashboard-page.component';
+import {
+  StudentNotificationPageComponent
+} from './pages/student/student-notification-page/student-notification-page.component';
 
 export const routes: Routes = [
   {
@@ -58,6 +61,7 @@ export const routes: Routes = [
     children: [
       {path: 'profile', component: StudentProfilePageComponent},
       {path: 'dashboard', component: StudentDashboardPageComponent},
+      {path: 'notification', component: StudentNotificationPageComponent},
       {
         path: 'subjects',
         children: [

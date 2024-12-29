@@ -2,6 +2,10 @@
   height: 100%;
 }
 
+.red {
+  color: tomato;
+}
+
 @media (max-width: 768px) {
   .drawer {
     width: 4rem; /* Reduce width to fit just the icons */

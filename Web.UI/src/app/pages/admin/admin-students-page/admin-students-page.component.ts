@@ -63,7 +63,7 @@ export class AdminStudentsPageComponent implements OnInit, OnDestroy {
 
   changeStudentLock(student: Student): void {
     console.log('page');
-    this.studentsService.ChangeStudentLock(student)
+    this.studentsService.UpdateStudentLockStatus(student)
       .pipe(takeUntil(this.destroy$))
       .subscribe(
         {

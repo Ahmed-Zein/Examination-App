@@ -44,8 +44,6 @@ export class StudentDashboardPageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data: StudentDashboard) => {
           this.dashboard = data;
-          console.log(data);
-          console.log(this.dashboard);
           this.pageState = PageState.Loaded;
         },
         error: (error: HttpErrorResponse) => {
