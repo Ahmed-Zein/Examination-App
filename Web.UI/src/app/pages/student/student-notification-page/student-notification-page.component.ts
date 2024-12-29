@@ -16,20 +16,7 @@ import {AuthService} from '../../../core/services/auth.service';
   styleUrl: './student-notification-page.component.css'
 })
 export class StudentNotificationPageComponent implements OnInit {
-  notifications: StudentNotification[] = [
-    {
-      id: '1',
-      content: 'New notification received.',
-      createdAt: '2024-12-29 10:00:00',
-      userId: '123',
-    },
-    {
-      id: '2',
-      content: 'Your course has been updated.',
-      createdAt: '2024-12-28 12:00:00',
-      userId: '123',
-    }
-  ];
+  notifications: StudentNotification[] = [];
   protected readonly Utils = Utils;
 
   constructor(private drawerService: DrawerService, private authService: AuthService, private studentService: StudentsService) {

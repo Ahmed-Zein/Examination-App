@@ -1,7 +1,6 @@
 ﻿using Application;
 using Core.Interfaces;
 using Infrastructure;
-using Infrastructure.Signalr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +29,7 @@ internal static class Program
         try
         {
             await signalrManager.EstablishConnection();
-            var notificationInitiator = serviceProvider.GetRequiredService<IClientNotificationInitiator>();
+            var notificationInitiator = serviceProvider.GetRequiredService<IClientSideNotification>();
             await notificationInitiator.SendBroadCastNotification("The rabbit says Hi");
         }
         catch (Exception e)

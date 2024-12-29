@@ -2,13 +2,7 @@ using Core.Interfaces;
 
 namespace Infrastructure.Signalr;
 
-public interface IClientNotificationInitiator : IDisposable
-{
-    Task SendBroadCastNotification(string message);
-    Task SendNotificationToUser(string userId);
-}
-
-public class ClientNotificationManager(ISignalrClientContext context) : IClientNotificationInitiator
+public class IClientSideNotificationManager(ISignalrClientContext context) : IClientSideNotification
 {
     public async Task SendBroadCastNotification(string message)
     {

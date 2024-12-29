@@ -17,7 +17,7 @@ public static class DependencyInjection
     {
         services.AddSignalR();
         services.AddScoped<ISignalrClientContext, SignalrClientContext>();
-        services.AddScoped<IClientNotificationInitiator, ClientNotificationManager>();
+        services.AddScoped<IClientSideNotification, IClientSideNotificationManager>();
 
         services.AddScoped<IRabbitConfig, RabbitConfig>();
         services.AddScoped<IRabbitPublisher, RabbitPublisher>();

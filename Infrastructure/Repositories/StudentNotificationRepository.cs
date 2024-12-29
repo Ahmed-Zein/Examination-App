@@ -24,8 +24,10 @@ public class StudentNotificationRepository(NotificationDbContext context) : IStu
             Builders<StudentNotification>.Filter.Eq(n => n.UserId, userId),
             Builders<StudentNotification>.Filter.Gt(n => n.CreatedAt, _notificationCutOffDate)
         );
+        var sorter = Builders<StudentNotification>.Sort.Descending(n => n.CreatedAt);
         var notifications = await context.StudentNotifications
             .Find(filter)
+            .Sort(sorter)
             .Limit(MaxNotificationCount)
             .ToListAsync();
 

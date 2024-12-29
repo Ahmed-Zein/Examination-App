@@ -1,9 +1,10 @@
 using System.Text;
 using System.Text.Json;
+using Application.Events.ExamEvaluated;
 using Application.Interfaces;
 using Application.Models;
 using Core.Interfaces;
-using Infrastructure.Signalr;
+using MediatR;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -11,8 +12,8 @@ namespace Infrastructure.RabbitMQ;
 
 public class RabbitEvaluationConsumer(
     IRabbitConfig config,
-    IEvaluationService examService,
-    IClientNotificationInitiator clientNotificationInitiator
+    IMediator mediator,
+    IEvaluationService examService
 ) : IRabbitConsumer, IDisposable
 {
     private readonly ConnectionFactory _connectionFactory = new()
@@ -50,7 +51,9 @@ public class RabbitEvaluationConsumer(
 
             try
             {
-                await clientNotificationInitiator.SendNotificationToUser(evaluationRequest.StudentId);
+                await mediator.Publish(new ExamEvaluatedEvent(evaluationRequest.StudentId));
+                // now we use mediatr events instead
+                // await clientNotificationInitiator.SendNotificationToUser(evaluationRequest.StudentId);
             }
             catch (Exception ex)
             {
