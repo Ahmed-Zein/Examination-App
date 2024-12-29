@@ -1,19 +1,20 @@
 using API.Helper;
 using Application.Commands.Notification.Student;
 using Application.Models;
+using Application.Queries.Notification.Admin;
 using Application.Queries.Notification.Student;
-using Core.Interfaces;
-using Core.Models;
+using Core.Constants;
+using Core.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controller;
 
+[Authorize]
 [ApiController]
 [Route("api/")]
-public class NotificationController(
-    IMediator mediator,
-    IAdminNotificationRepository adminRepository) : ControllerBase
+public class NotificationController(IMediator mediator) : ControllerBase
 {
     [HttpGet("students/{studentId}/notifications")]
     public async Task<ActionResult<JsonResponse<IEnumerable<StudentNotification>>>> GetStudentNotifications(
@@ -37,9 +38,10 @@ public class NotificationController(
     }
 
     [HttpGet("admins/notifications")]
+    [Authorize(Roles = AuthRolesConstants.Admin)]
     public async Task<IActionResult> GetAdminNotifications()
     {
-        var notifications = await adminRepository.GetAllAsync();
+        var notifications = await mediator.Send(new GetAdminNotificationsQuery());
         return Ok(JsonResponse<IEnumerable<AdminNotification>>.Ok(notifications));
     }
 }

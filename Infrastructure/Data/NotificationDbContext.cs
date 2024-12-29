@@ -1,4 +1,4 @@
-using Core.Models;
+using Core.Entities;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;

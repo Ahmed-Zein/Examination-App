@@ -1,6 +1,6 @@
 using Core.Constants;
+using Core.Entities;
 using Core.Interfaces;
-using Core.Models;
 using FluentResults;
 using Infrastructure.Data;
 using MongoDB.Driver;

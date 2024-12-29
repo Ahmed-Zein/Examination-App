@@ -6,7 +6,6 @@ using Core.Constants;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces;
-using Core.Models;
 using Core.Persistence;
 using FluentResults;
 using MediatR;
@@ -30,13 +29,13 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
         var notification = new StudentNotification
         {
             UserId = studentId,
-            Content = "Your solutions have been Received"
+            Content = "Your solutions have been Received, wait for evaluation to finish"
         };
 
-        await mediator.Send(new CreateStudentNotificationCommand(notification));
-        // Handle the case when the rabbit is down???
-        Task.WaitAll(rabbitPublisher.Publish(new RabbitExamRequest
-            { StudentId = studentId, ExamId = examId, Solutions = examSolutionsDto }));
+        // TODO: Handle the case when the rabbit is down???
+        Task.WaitAll(mediator.Send(new CreateStudentNotificationCommand(notification)), rabbitPublisher.Publish(
+            new RabbitExamRequest
+                { StudentId = studentId, ExamId = examId, Solutions = examSolutionsDto }));
 
         return Result.Ok();
     }
@@ -76,7 +75,7 @@ public class EvaluationService(IUnitOfWork unitOfWork, IRabbitPublisher rabbitPu
     }
 
 
-    public async Task<Result<ExamResult>> IsValidExamSolution(int examId, ExamSolutionsDto examSolutionsDto)
+    private async Task<Result<ExamResult>> IsValidExamSolution(int examId, ExamSolutionsDto examSolutionsDto)
     {
         // TODO: Move this to its own Fluent Validator Class??
         var repositoryResult = await unitOfWork.ExamResultRepository.GetByIdAsync(examSolutionsDto.ExamResultId);

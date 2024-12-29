@@ -1,4 +1,4 @@
-using Core.Models;
+using Core.Entities;
 using MediatR;
 
 namespace Application.Commands.Notification.Student;

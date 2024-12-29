@@ -1,5 +1,5 @@
+using Core.Entities;
 using Core.Interfaces;
-using Core.Models;
 using FluentResults;
 using MediatR;
 
